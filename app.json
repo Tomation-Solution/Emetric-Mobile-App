@@ -1,0 +1,10 @@
+{
+  "expo": {
+    "name": "emetric-suite",
+    "slug": "emetric-suite",
+    "version": "1.0.0",
+    "assetBundlePatterns": [
+      "**/*"
+    ]
+  }
+}
