@@ -1,12 +1,15 @@
 
-import api from '../helpers/api'
+// import api from '../helpers/api'
 import localStorage from 'react-native-sync-localstorage'
+import api from '../api/api'
 
 
 // const response = await api.post('login', { email, password });
-export const Login = async(email, password, callback, setLoading)=>{
+export const LoginUser = async(email, password)=>{
     try {
-        const response = await api.post('login', { email, password });
+        const response = await api.post('/auth/login/', { 'email':email, 'password':password });
+        console.log(response)
+        console.log(password)
         if (response.data.status) {
             console.log(response)
             callback(response.data);
@@ -16,13 +19,13 @@ export const Login = async(email, password, callback, setLoading)=>{
             localStorage.setItem('email', email)
             setLoading(false)
         } else {
-          console.log(response.data.status)
-          callback(response.data)
-        setLoading(false)
+        //   console.log(response.data.status)
+        //   callback(response.data)
+        // setLoading(false)
         }
     } catch (error) {
         console.error(error)
-        setLoading(false)
+        // setLoading(false)
 
     }
 }

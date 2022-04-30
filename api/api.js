@@ -9,21 +9,31 @@ const instance = axios.create({
 
 instance.interceptors.request.use((config) => {
 
-//   if (!config.noload) {
-//     Swal.fire({
-//       title: 'Please Wait !',
-//       html: 'Loading',// add html attribute if you want or remove
-//       allowOutsideClick: false,
-//       showConfirmButton: false,
-//       onBeforeOpen: () => {
-//         Swal.showLoading()
-//       },
-//     });
-//   }
-
   const token = localStorage.getItem('token');
   config.headers.Authorization = token ? `Bearer ${token}` : null;
+  
   return config;
 });
 
+instance.interceptors.response.use(response => {
+  return response;
+}, error => {
+ if (error.response.status === 401) {
+  //place your reentry code
+  alert('You are not authorized')
+ }
+ return error;
+});
+// instance.interceptors.response.use((response) => {
+
+//   if(response.status === 401) {
+//       alert("You are not authorized");
+//     }
+//   return response;
+// });
+
+// if(response.status === 401) {
+//   alert("You are not authorized");
+// }
+// return response;
 export default instance;

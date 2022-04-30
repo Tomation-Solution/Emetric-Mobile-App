@@ -3,11 +3,13 @@ import {useState} from 'react'
 import tw from 'tailwind-react-native-classnames'
 import RoundedButton from '../../components/button/RoundedButton'
 import ModalTemplate from '../../components/button/RoundedButton'
+import { LoginUser } from '../../actions/actions'
 import Ionicon from 'react-native-vector-icons/Ionicons'
 
 
 const OwingWidget=()=>{
   const [checked, setChecked] = useState(false)
+
 
   return(
     <View style={tw`bg-white mx-10 px-5 py-5 my-auto rounded-2xl`}>
@@ -44,6 +46,10 @@ const OwingWidget=()=>{
 export default function Login ({navigation}) {
 
   const [showPassword, setShowPassword] = useState(false)
+
+  const handleLogin =()=>{
+    LoginUser('emmaldini12+janedoe@gmail.com','password')
+  }
 
 
   return (
@@ -89,14 +95,14 @@ export default function Login ({navigation}) {
               </View>
           </View>
          
-              <TouchableOpacity onPress={()=>navigation.navigate('register')}>
+              <TouchableOpacity onPress={()=>handleLogin()}>
                 <Text style={tw`text-blue-700 font-bold text-right`}> Forgot Password?</Text>
               </TouchableOpacity>
          
           <View style={tw`my-2`}>
             <RoundedButton 
               text='Login'
-              pressed={()=>navigation.navigate('dashboard')}
+              pressed={()=>handleLogin()}
             />
           </View>
           {/* <TouchableOpacity onPress={()=>navigation.navigate('forgotPassword')}> 
