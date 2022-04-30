@@ -8,8 +8,8 @@ import SmallButton from "../button/SmallButton"
 
 export const TaskCard =(props)=>{
     return(
-        <Pressable style={tw`bg-white rounded-lg my-1 ${props.selected == props.id  ? 'h-32 my-auto':''} p-2`}>
-        <View style={tw`bg-white rounded-lg my-1 ${props.selected == props.id  ? 'h-32 my-auto':''} p-2`}> 
+        <Pressable style={tw`bg-white rounded-lg my-1  p-2`}>
+        
             <Text style={tw`pb-2 border-b text-xs mb-1 border-gray-200`}>{props.name}</Text>
             <View style={tw`flex-row justify-between`}>
                 <Text style={tw`my-auto text-xs`}>{props.time}</Text>
@@ -22,7 +22,7 @@ export const TaskCard =(props)=>{
             </View>
             
             { props.selected == props.id ?
-            <View style={tw` flex-row justify-end  px-2 absolute z-40 w-full`}>
+            <View style={tw` flex-row justify-end  px-2 relative z-40 w-full`}>
                 <View style={tw`bg-blue-100 w-4/12 px-3 rounded-lg`}>
                 <View style={tw`w-full`}>
                     <SmallButton pressed={()=>props.setView(true)} text='View'/>
@@ -44,7 +44,6 @@ export const TaskCard =(props)=>{
                 </View>
                 </View>
             </View>:<></>}
-            </View>
         </Pressable>
     )
 }
