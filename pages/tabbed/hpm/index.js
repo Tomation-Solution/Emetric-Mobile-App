@@ -1,0 +1,66 @@
+import { View, SafeAreaView, ScrollView, StatusBar, Platform,Text } from 'react-native'
+import React, {useState} from 'react'
+import tw from 'tailwind-react-native-classnames'
+import Ionicon from 'react-native-vector-icons/Ionicons'
+import MaterialIcon from 'react-native-vector-icons/MaterialIcons'
+import { createStackNavigator } from '@react-navigation/stack';
+
+import DueCard from '../../../components/card/dueCard'
+import IconCard from '../../../components/card/iconCard'
+import TobBar from '../../../components/helpers/topbar'
+import TabbedButton from '../../../components/button/TabbedButton'
+import individualTeam from './individualTeam'
+import Individual from './individual'
+import Team from './team'
+ 
+
+const Stack = createStackNavigator();
+
+export default function HPM({navigation}) {
+
+  const [selected, setSelected] = useState(0)
+
+  const handletabPress =(index, to)=>{
+    setSelected(index)
+    navigation.navigate(to)
+  }
+
+  return (
+    <SafeAreaView style={tw`h-full`}>
+        {Platform.OS == 'android'?
+        <StatusBar/>:<></>    
+    }
+
+    <TobBar
+        body={
+            <View style={tw`flex-row justify-between px-2 py-3 bg-gray-100`}>
+                <Ionicon name='menu' onPress={()=>navigation.toggleDrawer()} size={23} />
+                <Text style={tw`font-bold`}>Debo's Dashboard</Text>
+                <Ionicon name='md-notifications' size={20} />
+
+            </View>
+        }
+    />
+    <View >
+      <ScrollView showsHorizontalScrollIndicator={false} horizontal={true} style={tw`flex-row  px-4 mb-1`}>
+        <View style={tw`mr-4`}>
+          <TabbedButton text='My  Performance' index={0} selected={selected} pressed={()=>handletabPress(0, 'individual')}/>
+        </View>
+        <View style={tw`mr-4`}>
+          <TabbedButton text='Team Performance' index={1} selected={selected} pressed={()=>handletabPress(1, 'team')} />
+        </View>
+        <View style={tw`mr-10`}>
+          <TabbedButton text='Individul Team Performance' index={2} selected={selected} pressed={()=>handletabPress(2, 'individualTeam')}/>
+        </View>
+    </ScrollView>
+    </View>
+    {/* <View style={tw`h-20`}> */}
+      <Stack.Navigator screenOptions={{headerShown:false}} initialRouteName='individual'>
+        <Stack.Screen name='individual' component={Individual} />
+        <Stack.Screen name='team' component={Team} />
+        <Stack.Screen name='individualTeam' component={individualTeam} />
+      </Stack.Navigator>
+          
+    </SafeAreaView>
+  )
+}
