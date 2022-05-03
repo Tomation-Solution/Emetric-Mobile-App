@@ -1,17 +1,39 @@
 import { View, FlatList, Text } from 'react-native'
-import React from 'react'
+import React, {useEffect, useState} from 'react'
+import localStorage from 'react-native-sync-localstorage'
 import tw from 'tailwind-react-native-classnames'
 
 import IconCard from '../../../components/card/iconCard'
+import { TeamTasksByUid } from '../../../actions/actionsTeam'
 
 
 export default function Team() {
+
+    const [stats, setStats] = useState({
+        tps:0, ttt:0, tjql:0, tjqt:0 
+    })
   const data = [
-    {id:1, name:'Team Performance Score', value:'20 %'},
-    {id:2, name:'Team Turnaround Time', value:'41 %'},
-    {id:3, name:'Team Job Quality Score', value:'52 %'},
-    {id:4, name:'Team Job Quantity Score', value:'13 %'}
+    {id:1, name:'Team Performance Score', value:stats.tps, percent:true},
+    {id:2, name:'Team Turnaround Time', value:stats.ttt, percent:true},
+    {id:3, name:'Team Job Quality Score', value:stats.tjql, percent:true},
+    {id:4, name:'Team Job Quantity Score', value:stats.tjqt, percent:true}
 ]
+
+useEffect(()=>{
+    TeamTasksByUid(callback)
+},[])
+
+const callback =(res)=>{
+    console.log(res)
+    setStats({
+        tjql:res.map(e=>e.percentage_cumulative_quality_target_point_achieved),
+        ttt:res.map(e=>e.percentage_cumulative_turn_around_time_target_point_achieved),
+        tjqt:res.map(e=>e.percentage_cumulative_quantity_target_point_achieved),
+        tps:res.map(e=>e.percentage_cumulative_target_point_achieved),
+
+    })
+    console.log(res.map(e=>e))
+}
 return (
 
 <FlatList
@@ -27,6 +49,7 @@ return (
             <IconCard
                 amount={item.value}
                 description={item.name}
+                percent={item.percent}
                 bg='bg-blue-100'
             />
         </View>

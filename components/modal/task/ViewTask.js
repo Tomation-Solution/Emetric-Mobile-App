@@ -16,7 +16,7 @@ const [visible, setVisible] = useState(true)
 const [selected, setSelected] = useState(0)
 
 
-
+console.log(props.details)
   return (
     <View style={tw`m-auto bg-white rounded-xl w-full`}>
         <View style={tw`w-10/12 flex-row justify-end mr-7`}>
@@ -38,9 +38,9 @@ const [selected, setSelected] = useState(0)
         {/* <Text>Yooh</Text> */}
         
         { selected ==0 ?
-            <BasicInfo/>
+            <BasicInfo details={props.details} />
             :
-            <Target/>
+            <Target details={props.details}/>
         }
     </View>
             

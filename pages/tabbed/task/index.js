@@ -4,6 +4,7 @@ import tw from 'tailwind-react-native-classnames'
 import Ionicon from 'react-native-vector-icons/Ionicons'
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons'
 import { createStackNavigator } from '@react-navigation/stack';
+import localStorage from 'react-native-sync-localstorage'
 
 import DueCard from '../../../components/card/dueCard'
 import IconCard from '../../../components/card/iconCard'
@@ -52,7 +53,7 @@ export default function Task({navigation}) {
     <TobBar
         body={
             <View style={tw`flex-row justify-between px-2 py-3 bg-gray-100`}>
-                <Ionicon name='menu' onPress={()=>navigation.toggleDrawer()} size={23} />
+                <Ionicon name='md-chevron-back' onPress={()=>navigation.navigate('Home')} size={23} />
                 <Text style={tw`font-bold`}>Debo's Task Deck</Text>
                 <Ionicon name='md-notifications' size={20} />
 
@@ -62,9 +63,12 @@ export default function Task({navigation}) {
 
     <View style={tw`flex-row justify-around px-4 mb-1`}>
       <TabbedButton text='My  Tasks' index={0} selected={selected} pressed={()=>handletabPress(0, 'individual-task')}/>
-      <TabbedButton text='Team Tasks' index={1} selected={selected} pressed={()=>handletabPress(1, 'team-task')} />
-      <TabbedButton text='AddTask' index={2} selected={selected} pressed={()=>handletabPress(2, 'corporate')}/>
-      <TabbedButton text='Upload Task' index={3} selected={selected} pressed={()=>handletabPress(3, 'corporate')}/>
+      { localStorage.getItem('user_role') !='team_lead' && localStorage.getItem('user_role') !='admin'?<></>:
+      <TabbedButton text='Team Tasks' index={1} selected={selected} pressed={()=>handletabPress(1, 'team-task')} />}
+      { localStorage.getItem('user_role') !='team_lead' && localStorage.getItem('user_role') !='admin'?<></>:
+      <TabbedButton text='AddTask' index={2} selected={selected} pressed={()=>handletabPress(2, 'corporate')}/>}
+      { localStorage.getItem('user_role') !='team_lead' && localStorage.getItem('user_role') !='admin'?<></>:
+      <TabbedButton text='Upload Task' index={3} selected={selected} pressed={()=>handletabPress(3, 'corporate')}/>}
     </View>
     {/* <View style={tw`h-20`}> */}
       <Stack.Navigator screenOptions={{headerShown:false}} initialRouteName='individual-task'>

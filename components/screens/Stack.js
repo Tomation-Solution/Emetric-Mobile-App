@@ -23,7 +23,7 @@ export default function Stack() {
     // <NavigationContainer>
       <StackScreen.Navigator screenOptions={{headerShown:false}} >
           <StackScreen.Screen name='login' component={Login}/>
-          <StackScreen.Screen  name='register' component={Register}/>
+          <StackScreen.Screen  name='forgotPassword' component={Register}/>
           <StackScreen.Screen  name='changedPassword' component={ChangedPassword}/>
           <StackScreen.Screen name='members' component={Members}/>
           <StackScreen.Screen name='submitTask' component={SubmiTask}/>

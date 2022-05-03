@@ -34,7 +34,7 @@ export default function HPM({navigation}) {
     <TobBar
         body={
             <View style={tw`flex-row justify-between px-2 py-3 bg-gray-100`}>
-                <Ionicon name='menu' onPress={()=>navigation.toggleDrawer()} size={23} />
+                <Ionicon name='md-chevron-back' onPress={()=>navigation.navigate('Home')} size={23} />
                 <Text style={tw`font-bold`}>Debo's Dashboard</Text>
                 <Ionicon name='md-notifications' size={20} />
 

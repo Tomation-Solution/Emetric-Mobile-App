@@ -1,6 +1,6 @@
 import { ScrollView,View, FlatList, Picker, Text } from 'react-native'
 import {List, Portal} from 'react-native-paper'
-import React, {useState} from 'react'
+import React, {useState, useEffect} from 'react'
 import tw from 'tailwind-react-native-classnames'
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons' 
 import FeatherIcon from 'react-native-vector-icons/Feather' 
@@ -18,6 +18,10 @@ import CustomPicker from '../../../components/helpers/Picker'
 import ViewTask from '../../../components/modal/task/ViewTask'
 import FilterPicker from '../../../components/helpers/filterPicker'
 import SubTabButton from '../../../components/button/SubTabButton'
+import { TeamTasksLists, TeamTasksByUid, MemberTasks, MemberTasksByEmail } from '../../../actions/actionsTeam'
+import Submit from '../../../components/modal/task/Submit'
+import Rework from '../../../components/modal/task/Rework'
+import Rate from '../../../components/modal/task/Rate'
 
 export default function Individual() {
 
@@ -30,32 +34,99 @@ export default function Individual() {
     const [rateTask, setRateTask] = useState(false)
     const [selected,setSelected] =  useState(null)
     const [selectedTab,setSelectedTab] =  useState(1)
-    const [portalId, setPortalId] =useState(null)
+    const [teamMembers, setTeamMembers] =useState(null)
+    const [dashboardData, setDashboardData] = useState({
+        pending:0, active:0, over_due:0,closed:0
+    })
+    const [expanded, setExpanded] = React.useState(false);
+    const [expandedMember, setExpandedMember] = React.useState(false);
+    const handlePress = () => setExpanded(!expanded);
+    const handleMemberPress = () => setExpandedMember(!expandedMember);
+    const [filter, setFilter] = useState(null)
+    const [memberEmail, setMemberEmail] = useState(null)
+    const [filterMember, setFilterMember] = useState(null)
+    const [listData, setListData] = useState(null)
+    const [selectedVal, setSelectedVal] = useState('pending')
+    const [item, setItem] = useState(null)
+
+    const handleChildPress = (income) => {
+        setExpanded(!expanded)
+        setFilter(income.name)
+    };
+
+    const handleSelection =(id, item)=>{
+        if(id==selected){
+            setSelected(null)
+        }else{
+            setSelected(id)
+            setItem(item)
+        }
+    }
+
+    
+    const handleChildPressMember = (selectedMember) => {
+        setMemberEmail(selectedMember.email)
+        setExpandedMember(!expandedMember)
+        setFilterMember(selectedMember.first_name+ ' '+selectedMember.last_name )
+        
+        // console.log(selectedMember.email)
+    };
+
     const data = [
-        {id:1, name:'My Pending Task', value:2},
-        {id:2, name:'My Active Task', value:4},
-        {id:3, name:'My Overdue Task', value:5},
-        {id:4, name:'My Completed Task', value:3}
+        {id:1, name:'My Pending Task', value:dashboardData.pending},
+        {id:2, name:'My Active Task', value:dashboardData.active},
+        {id:3, name:'My Overdue Task', value:dashboardData.over_due},
+        {id:4, name:'My Completed Task', value:dashboardData.closed}
     ]
 
     const tabData = [
-        {id:1, name:'Pending', value:2},
-        {id:2, name:'Active', value:4},
-        {id:3, name:'Overdue', value:5},
-        {id:4, name:'Awaiting Rating', value:3},
-        {id:5, name:'Rework', value:3},
-        {id:6, name:'Rework Overdue', value:3},
-        {id:7, name:'Closed', value:3}
+        {id:1, name:'Pending', value:'pending'},
+        {id:2, name:'Active', value:'active'},
+        {id:3, name:'Overdue', value:'over_due'},
+        {id:4, name:'Awaiting Rating', value:'awaiting_rating'},
+        {id:5, name:'Rework', value:'rework'},
+        {id:6, name:'Rework Overdue', value:'rework_over_due'},
+        {id:7, name:'Closed', value:'closed'}
     ]
 
-    const cardData = [
-        {id:1, name:'Responsibilities For The Day To Day Relationship Managment of Chanel Patners Demo 1@gmail.com', time:'2022- 04-22 08:00:00', status:'Pending'},
-        {id:2, name:'Responsibilities For The Day To Day Relationship Managment of Chanel Patners Demo 1@gmail.com', time:'2022- 04-22 08:00:00', status:'Pending'},
-        {id:3, name:'Responsibilities For The Day To Day Relationship Managment of Chanel Patners Demo 1@gmail.com', time:'2022- 04-22 08:00:00', status:'Pending'},
-        {id:4, name:'Responsibilities For The Day To Day Relationship Managment of Chanel Patners Demo 1@gmail.com', time:'2022- 04-22 08:00:00', status:'Pending'},
-        {id:5, name:'Responsibilities For The Day To Day Relationship Managment of Chanel Patners Demo 1@gmail.com', time:'2022- 04-22 08:00:00', status:'Pending'},
-       
+    const filterData=[
+        {id:1, name:'Day'},
+        {id:2, name:'Week'},
+        {id:3, name:'Month'},
+        {id:4, name:'Quarter'},
+        {id:5, name:'Bi-Annual'},
+        {id:6, name:'Annual'},
     ]
+
+    useEffect(()=>{
+        // TeamTasksLists(callback)
+        MemberTasks(dashboardCallback)
+        if(memberEmail){
+            MemberTasksByEmail(memberEmail,callback)
+        }
+        
+    },[memberEmail])
+
+    const callback = (res)=>{
+        console.log(res.data.data)
+        setDashboardData({
+            pending:res.data.data.filter(e=>e.task_status=='pending').length,
+            active: res.data.data.filter(e=>e.task_status=='active').length,
+            over_due: res.data.data.filter(e=>e.task_status=='over_due').length,
+            closed: res.data.data.filter(e=>e.task_status=='closed').length,
+        })
+        setListData(res.data.data)
+    }
+
+    const dashboardCallback = (res)=>{
+        // console.log(res.data.data.map(e=>e.user.first_name))
+        setTeamMembers(res.data.data.map(e=>e.user))
+    }
+
+    const handleSubTab=(info)=>{
+        setSelectedTab(info.id)
+        setSelectedVal(info.value)
+    }
 
     const HeadButtons =()=>{
         return(
@@ -90,8 +161,8 @@ export default function Individual() {
                 >
                     {tabData.map((e,index)=>
                     // <ScrollView horizontal style={tw`w-full`}>
-                    <SubTabButton text={e.name} 
-                    pressed={()=>setSelectedTab(e.id)} 
+                    <SubTabButton text={e.name}  key={e.id}
+                    pressed={()=>handleSubTab(e)} 
                     selected={selectedTab} index={e.id} />
                     // </ScrollView>
                     )}
@@ -101,39 +172,49 @@ export default function Individual() {
         )
     } 
 
-    const handleSelection =(id)=>{
-        if(id==selected){
-            setSelected(null)
-        }else{
-            setSelected(id)
-        }
-    }
+    
   return (
     <View>
         <ModalTemplate visible={addTask}  body={<AddTask setVisible={setAddTask}/>}/>
         <ModalTemplate visible={uploadTask}   body={<UploadTask setVisible={setUploadTask}/>}/>
         <ModalTemplate visible={viewTask}   body={<ViewTask setVisible={setViewTask}/>}/>
-        <ModalTemplate visible={submitTask}   body={<UploadTask setVisible={setSubmitTask}/>}/>
-        <ModalTemplate visible={reworkTask}   body={<UploadTask setVisible={setReworkTask}/>}/>
-        <ModalTemplate visible={rateTask}   body={<UploadTask setVisible={setRateTask}/>}/>
+        <ModalTemplate visible={submitTask}   body={<Submit setVisible={setSubmitTask}/>}/>
+        <ModalTemplate visible={reworkTask}   body={<Rework setVisible={setReworkTask}/>}/>
+        <ModalTemplate visible={rateTask}   body={<Rate setVisible={setRateTask} id={selected}/>}/>
         {/* <View style={tw`mx-2`}> */}
         <View style={tw`w-11/12 mb-1 mx-3 flex-row justify-between`}>
-            <List.Accordion
-                title='Slect'>
-                    <List.Item title='Yeah'/>
-            </List.Accordion>
-            <CustomPicker 
+           
+            {/* <List.Section style={tw`bg-red-300 `}
+                title='Select Category' collapsable>
+                // <View> */}
+                <View style={tw`w-4/12`}>
+                <List.Accordion style={tw`w-full text-red-900`} expanded={expanded}
+                    onPress={handlePress} titleNumberOfLines={1}  title={!filter ?'Filter':filter}>
+                   {filterData.map((e)=>
+                    <List.Item style={tw`text-red-900 text-xs`} key={e.id} title={e.name} onPress={()=>handleChildPress(e)}/>)}
+                    </List.Accordion>
+                </View>
+            {/* </List.Section> */}
+            <View style={tw`w-7/12`}>
+                <List.Accordion style={tw`w-full text-xs`} expanded={expandedMember}
+        onPress={handleMemberPress} titleStyle={tw`text-blue-800`} titleNumberOfLines={1}  title={!filterMember ?'Select Member':filterMember}>
+                   {teamMembers?.map((e)=>
+                    <List.Item style={tw` text-xs`} key={e.id} title={e.first_name + ' '+ e.last_name} onPress={()=>handleChildPressMember(e)}/>)}
+                    </List.Accordion>
+                </View>
+            {/* <CustomPicker 
                 label='Get Team Member Task'
-                options={[
-                    {id:1, label:'Bola Johnson', value:'Bola Johnson'}
-                ]}
-            />
+                options={
+                    teamMembers? teamMembers.map(e=>
+                    ({id:e.user_id, label:e.first_name, value:e.last_name}))
+                :''}
+            /> */}
         </View>
         {/* </View> */}
         <FlatList
-            data={cardData}
+            data={listData?listData.filter(e=>e.task_status==selectedVal):''}
             keyExtractor={(item)=>item.id}
-            ListHeaderComponent={<HeadComponent/>}
+            ListHeaderComponent={filterMember?<HeadComponent/>:<></>}
             style={tw`p-5 bg-gray-100`}
             ListFooterComponent={<View style={tw`h-10`}/>}
             renderItem={
@@ -142,18 +223,19 @@ export default function Individual() {
                    
 
                     <TaskCard name={item.name}
-                    time={item.time}
-                    status={item.status}
-                    id={item.id}
+                    time={item.start_date+' '+item.start_time}
+                    status={item.task_status}
+                    id={item.task_id}
                     selected ={selected} 
                     setSelected ={setSelected} 
                     setView ={setViewTask} 
                     setSubmit ={setSubmitTask} 
                     setRework ={setReworkTask} 
                     setRate ={setRateTask} 
+                    item={item}
                     button1={
                             
-                        <TouchableOpacity onPress={()=>handleSelection(item.id)} style={tw`px-2 rounded-lg w-5/6 border border-blue-900`}>
+                        <TouchableOpacity onPress={()=>handleSelection(item.task_id,item)} style={tw`px-2 rounded-lg w-5/6 border border-blue-900`}>
                             <FeatherIcon size={20} name='more-horizontal'/>
                         </TouchableOpacity>
                     

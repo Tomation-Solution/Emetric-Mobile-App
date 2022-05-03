@@ -5,27 +5,214 @@ import api from '../api/api'
 
 
 // const response = await api.post('login', { email, password });
-export const LoginUser = async(email, password)=>{
+export const LoginUser = async(data, org, callback)=>{
     try {
-        const response = await api.post('/auth/login/', { 'email':email, 'password':password });
-        console.log(response)
-        console.log(password)
-        if (response.data.status) {
-            console.log(response)
-            callback(response.data);
-            localStorage.setItem('token',response.data.token)
-            localStorage.setItem('user',response.data)
-            localStorage.setItem('password', password)
-            localStorage.setItem('email', email)
-            setLoading(false)
+        const response = await api.post(`client/${org}/auth/login/`,data);
+       
+        if (response.status ==200) {
+            localStorage.setItem('token',response.data.data.tokens.access)
+            localStorage.setItem('org_name',org)
+            
+            const user= await api.get(`client/${org}/employee/?user__email=${data.email}`)
+            if(user.status==200){
+                console.log(user.data.data)
+                console.log(user.data.data.map(e=>e.corporate_level.uuid))
+
+                if(user.data.data.map(e=>e.user.user_role)=='team_lead'){
+                localStorage.setItem('team_uuid',user.data.data.map(e=>e.corporate_level.uuid))
+                }else{localStorage.setItem('team_uuid',null)}
+                localStorage.setItem('user_role',user.data.data.map(e=>e.user.user_role))
+                localStorage.setItem('user_id',user.data.data.map(e=>e.user.user_id))
+                localStorage.setItem('uuid',user.data.data.map(e=>e.uuid))
+                localStorage.setItem('first_name', user.data.data.map(e=>e.user.first_name))
+                localStorage.setItem('last_name', user.data.data.map(e=>e.user.last_name))
+                localStorage.setItem('last_name', user.data.data.map(e=>e.user.last_name))
+                localStorage.setItem('email', user.data.data.map(e=>e.user.email))
+
+
+                callback(response)
+                
+            }
+        
         } else {
-        //   console.log(response.data.status)
+          console.log(response.data)
+          alert(response.message)
         //   callback(response.data)
         // setLoading(false)
         }
     } catch (error) {
         console.error(error)
+        // if(error.code)
+        if(error.message.includes('401'||'404')){
+            alert('Invalid Login Details')
+        }else{
+        alert(error.message)
+        }
+        // setLoading(false)reposn
+
+    }
+}
+
+//gets user Tasks by status
+
+export const UserTasksByStatus = async(status,callback, startDate, endDate)=>{
+    // console.log(localStorage.getItem('user_id'))
+    try {
+        const response = startDate ? await api.get(`client/${localStorage.getItem('org_name')}/task/?owner_email=${localStorage.getItem('email')}&task_status=${status}`)
+        : await api.get(`client/${localStorage.getItem('org_name')}/task/?owner_email=${localStorage.getItem('email')}&task_status=${status}`);
+    //    console.log(localStorage.getItem('uuid')) 
+        if (response.status==200) {
+            callback(response);
+        } else {
+          console.log(response.data.status)
+          callback(response.data)
+        }
+    } catch (error) {
+        console.error(error)
         // setLoading(false)
+
+    }
+}
+
+
+
+export const UserTasksByEmail = async(callback, startDate, endDate)=>{
+    // &start_date_after=${startDate}&start_date_before=${endDate}
+    // console.log(localStorage.getItem('user_id'))
+    try {
+        const response = !startDate ? await api.get(`client/${localStorage.getItem('org_name')}/task/?owner_email=${localStorage.getItem('email')}`)
+        : await api.get(`client/${localStorage.getItem('org_name')}/task/?owner_email=${localStorage.getItem('email')}&start_date_before=${startDate}`)
+    //    console.log(localStorage.getItem('uuid')) 
+        if (response.status==200) {
+            callback(response);
+        } else {
+          console.log(response.data.status)
+          callback(response.data)
+        }
+    } catch (error) {
+        console.error(error)
+        // setLoading(false)
+
+    }
+}
+
+// await axios.get(`/client/${ORG_NAME}/task/report/user/${loggedinUser.uuid}/?start_date_before=${start_date_before}&start_date_after=${start_date_after}`)
+export const MyPerformance = async(callback,startDate)=>{
+    try {
+        const response = startDate ? await api.get(`client/${localStorage.getItem('org_name')}/task/report/user/${localStorage.getItem('user_id')}/?start_date_before=${start_date_before}&start_date_after=${start_date_after}`)
+        : await api.get(`client/${localStorage.getItem('org_name')}/task/report/user/${localStorage.getItem('user_id')}/`)
+        //    console.log(localStorage.getItem('uuid')) 
+        if (response.status==200) {
+            callback(response);
+        } else {
+          console.log(response.data.status)
+          callback(response.data)
+        }
+    } catch (error) {
+        console.error(error)
+        // setLoading(false)
+
+    }
+}
+
+export const MyPerformanceDash = async(callback,startDate)=>{
+    try {
+        const response = startDate ? await api.get(`client/${localStorage.getItem('org_name')}/task/report/user/${localStorage.getItem('user_id')}/?start_date_before=${start_date_before}&start_date_after=${start_date_after}`)
+        : await api.get(`client/${localStorage.getItem('org_name')}/task/report/user/${localStorage.getItem('user_id')}/?dashboard_report=True`)
+        //    console.log(localStorage.getItem('uuid')) 
+        if (response.status==200) {
+            callback(response);
+        } else {
+          console.log(response.data.status)
+          callback(response.data)
+        }
+    } catch (error) {
+        console.error(error)
+        // setLoading(false)
+
+    }
+}
+
+
+// `/client/${ORG_NAME}/task/?owner_email=${loggedinUser.email}&task_status=active
+// User Task Dashboard
+export const UserTaskInfo = async(callback)=>{
+    // console.log(localStorage.getItem('user_id'))
+    try {
+        const response = await api.get(`client/${localStorage.getItem('org_name')}/task/report/user/${localStorage.getItem('user_id')}/?start_date_after=2022-01-06`);
+    //    console.log(localStorage.getItem('uuid')) 
+        if (response.status==200) {
+            // console.log(response.data.data[0])
+            alert('yoh')
+            callback(response);
+            // localStorage.setItem('token',response.data.token)
+            // localStorage.setItem('user',response.data)
+            // setLoading(false)
+        } else {
+          console.log(response.data.status)
+          callback(response.data)
+        // setLoading(false)
+        }
+    } catch (error) {
+        console.error(error)
+        // setLoading(false)
+
+    }
+}
+
+
+
+
+
+// User Task Dashboard
+export const UserDashboard = async(callback)=>{
+    // console.log(localStorage.getItem('user_id'))
+    try {
+        const response = await api.get(`client/${localStorage.getItem('org_name')}/task/report/user/${localStorage.getItem('user_id')}/?start_date_after=2022-01-06&dashboard_report=True/`);
+    //    console.log(response) 
+        if (response.status==200) {
+            // console.log(response.data.data[0])
+            callback(response.data.data);
+            
+        } else {
+          console.log(response.data.status)
+          callback(response.data)
+        // setLoading(false)
+        }
+    } catch (error) {
+        console.error(error)
+        // setLoading(false)
+
+    }
+}
+
+// client/{{ORGANISATION_NAME}}/task/
+export const CreateTask = async(data, callback)=>{
+    console.log(data)
+    try {
+        const response = await api.post(`client/${localStorage.getItem('org_name')}/task/`,data);
+       
+        if (response.status ==201) {
+            alert('yeah')
+                console.log(response)
+                callback(response)
+            
+        
+        } else {
+          console.log(response.data)
+          alert(response.message)
+        //   callback(response.data)
+        // setLoading(false)
+        }
+    } catch (error) {
+        console.error(error)
+        // if(error.code)
+        if(error.message.includes('401'||'404')){
+            alert('Invalid Login Details')
+        }else{
+        alert(error.message)
+        }
+        // setLoading(false)reposn
 
     }
 }

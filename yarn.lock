@@ -1488,6 +1488,11 @@
   dependencies:
     invariant "^2.2.4"
 
+"@react-native-picker/picker@^2.4.1":
+  version "2.4.1"
+  resolved "https://registry.yarnpkg.com/@react-native-picker/picker/-/picker-2.4.1.tgz#92feb7e0672d739624517dae04bf4de1452dfcdc"
+  integrity sha512-1XWy3IQgwr7MWd30KdY1iUh2gQZD+JiotN1ifj/ptFUYKon/0UFwngKQaWCO/CP/FdLl20/huSSLwKedYrdMMA==
+
 "@react-native/assets@1.0.0":
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/@react-native/assets/-/assets-1.0.0.tgz#c6f9bf63d274bafc8e970628de24986b30a55c8e"
@@ -4498,6 +4503,11 @@ modern-normalize@^1.1.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/modern-normalize/-/modern-normalize-1.1.0.tgz#da8e80140d9221426bd4f725c6e11283d34f90b7"
   integrity sha512-2lMlY1Yc1+CUy0gw4H95uNN7vjbpoED7NNRSBHE25nWfLBdmMzFCsPshlzbxHz+gYMcBEUN8V4pU16prcdPSgA==
+
+moment@^2.29.3:
+  version "2.29.3"
+  resolved "https://registry.yarnpkg.com/moment/-/moment-2.29.3.tgz#edd47411c322413999f7a5940d526de183c031f3"
+  integrity sha512-c6YRvhEo//6T2Jz/vVtYzqBzwvPT95JBQ+smCytzf7c50oMZRsR/a4w88aD34I+/QVSfnoAnSBFPJHItlOMJVw==
 
 ms@2.0.0:
   version "2.0.0"

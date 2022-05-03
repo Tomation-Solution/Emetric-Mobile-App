@@ -48,16 +48,16 @@ export default function CustomDrawerList({navigation}) {
     }
     const drawerData=[
         {id:1, label:'Dashboard', to:'dashboard', icon:<MaterialCom name='view-dashboard-outline' size={22} style={tw`text-center text-blue-900`} color={'grey'}/>},
-        {id:2, label:'Tasks', to:'events', icon:(<MaterialIcon name='event-available' style={tw`text-center text-blue-900`} color={'grey'} size={22}/>)},
-        {id:3, label:'HPM', to:'news', icon:<Ionicon name="ios-bar-chart" size={22} style={tw`text-center text-blue-900`}
+        {id:2, label:'Tasks', to:'tasks', icon:(<MaterialIcon name='event-available' style={tw`text-center text-blue-900`} color={'grey'} size={22}/>)},
+        {id:3, label:'HPM', to:'hpm', icon:<Ionicon name="ios-bar-chart" size={22} style={tw`text-center text-blue-900`}
         />},
-        {id:5, label:'Messages', to:'gallery', icon:<Ionicon name="chatbubbles-outline" size={22}  style={tw`text-center text-blue-900`}
+        {id:5, label:'Messages', to:'account', icon:<Ionicon name="chatbubbles-outline" size={22}  style={tw`text-center text-blue-900`}
         /> },
         
-        {id:8, label:'Profile', to:'support', icon:<Ionicon name="ios-person-circle-outline" size={22} style={tw`text-center text-blue-900`}
+        {id:8, label:'Profile', to:'account', icon:<Ionicon name="ios-person-circle-outline" size={22} style={tw`text-center text-blue-900`}
      /> },
-     {id:7, label:'About', to:'about', icon:<Ionicon name="md-settings-outline" size={22} style={tw`text-center text-blue-900`}
-     /> }
+    //  {id:7, label:'About', to:'/', icon:<Ionicon name="md-settings-outline" size={22} style={tw`text-center text-blue-900`}
+    //  /> }
     ]
 
 
