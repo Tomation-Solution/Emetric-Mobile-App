@@ -5,6 +5,7 @@ import Ionicon from 'react-native-vector-icons/Ionicons'
 import * as DocumentPicker from 'expo-document-picker';
 
 import RoundedButton from '../button/RoundedButton';
+import { UploadBulkTask } from '../../actions/actionsTeam';
 
 
 export default function UploadTask(props) {
@@ -15,6 +16,16 @@ export default function UploadTask(props) {
             setDocument(result.uri)
         }
 	}
+
+    const callback =(res)=>{
+        console.log(res)
+    }
+    const onSubmit =()=>{
+        let formData = new FormData();
+        formData.append('template_file',document);
+
+        UploadBulkTask(callback, formData)
+    }
 
   return (
     <View style={tw`bg-white w-10/12 m-auto pt-3 pb-5`}>
@@ -35,9 +46,9 @@ export default function UploadTask(props) {
         </Pressable>
         { document ?
             <View style={tw`w-6/12 mx-auto`}>
-                <RoundedButton text='Upload'/>
+                <RoundedButton pressed={()=>onSubmit()} text='Upload'/>
             </View>: <View style={tw`w-6/12 mx-auto`}>
-                <RoundedButton text='Upload'/>
+                <Text style={tw`text-center bg-gray-200 py-3 rounded-lg`}>Upload</Text>
             </View>
         }
     </View>

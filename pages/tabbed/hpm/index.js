@@ -50,7 +50,7 @@ export default function HPM({navigation}) {
           <TabbedButton text='Team Performance' index={1} selected={selected} pressed={()=>handletabPress(1, 'team')} />
         </View>
         <View style={tw`mr-10`}>
-          <TabbedButton text='Individul Team Performance' index={2} selected={selected} pressed={()=>handletabPress(2, 'individualTeam')}/>
+          <TabbedButton text='Individual Team Performance' index={2} selected={selected} pressed={()=>handletabPress(2, 'individualTeam')}/>
         </View>
     </ScrollView>
     </View>

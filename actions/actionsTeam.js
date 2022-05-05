@@ -210,3 +210,26 @@ export const RateTask = async(taskId,callback,formdata,config)=>{
 
     }
 }
+
+// ,{width:props.width ? '45%':'93%'}
+// /client/{{ORGANISATION_NAME}}/task/bulk-add/
+export const UploadBulkTask = async(callback,formdata)=>{
+    // console.log(localStorage.getItem('user_id'))
+    console.log(formdata)
+    try {
+        const response = await api.post(`client/${localStorage.getItem('org_name')}/task/bulk-add/`, formdata);  
+        if (response.status==200) {
+            console.log(response)
+            callback(response.data.data);
+            
+        } else {
+          console.log(response.data.status)
+          callback(response.data)
+        // setLoading(false)
+        }
+    } catch (error) {
+        console.error(error)
+        // setLoading(false)
+
+    }
+}

@@ -56,7 +56,7 @@ let formData = new FormData();
 // const convertToFormData=()=>{ 
     formData.append('quality_target_point_achieved',rateScore)
     formData.append('rating_remark',JSON.stringify(remark) )   //append the values with key, value pair
-    formData.append('submission',document)
+    // formData.append('submission',document)
     formData.append('use_owner_submission', 'false')
 // }
 
