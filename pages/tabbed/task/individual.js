@@ -22,6 +22,7 @@ import TabbedButton from '../../../components/button/TabbedButton'
 import SubTabButton from '../../../components/button/SubTabButton'
 import { setWarningFilter } from 'react-native/Libraries/LogBox/Data/LogBoxData'
 import { UserTaskInfo, UserTasksByEmail, UserTasksByStatus } from '../../../actions/actions'
+import { or } from 'react-native-reanimated'
 
 export default function Individual({navigation}) {
 
@@ -69,14 +70,7 @@ export default function Individual({navigation}) {
         {id:7, name:'Closed', status:'closed',value:3}
     ]
 
-    const cardData = [
-        {id:1, name:'Responsibilities For The Day To Day Relationship Managment of Chanel Patners Demo 1@gmail.com', time:'2022- 04-22 08:00:00', status:'Pending'},
-        {id:2, name:'Responsibilities For The Day To Day Relationship Managment of Chanel Patners Demo 1@gmail.com', time:'2022- 04-22 08:00:00', status:'Pending'},
-        {id:3, name:'Responsibilities For The Day To Day Relationship Managment of Chanel Patners Demo 1@gmail.com', time:'2022- 04-22 08:00:00', status:'Pending'},
-        {id:4, name:'Responsibilities For The Day To Day Relationship Managment of Chanel Patners Demo 1@gmail.com', time:'2022- 04-22 08:00:00', status:'Pending'},
-        {id:5, name:'Responsibilities For The Day To Day Relationship Managment of Chanel Patners Demo 1@gmail.com', time:'2022- 04-22 08:00:00', status:'Awaiting Rating'},
-       
-    ]
+    
 
     const filterData=[
         {id:1, name:'Day'},
@@ -222,13 +216,14 @@ const overdueCallback=(res)=>{
             setDetails(item)
         }
     }
+    // console.log(org)
   return (
     <View style={tw`h-full`}>
         <ModalTemplate visible={addTask}  body={<AddTask setVisible={setAddTask}/>}/>
         <ModalTemplate visible={uploadTask}   body={<UploadTask setVisible={setUploadTask}/>}/>
         <ModalTemplate visible={viewTask}   body={<ViewTask setVisible={setViewTask} details={details} />}/>
-        <ModalTemplate visible={submitTask}   body={<UploadTask setVisible={setSubmitTask}/>}/>
-        <ModalTemplate visible={reworkTask}   body={<Rework setVisible={setReworkTask}/>}/>
+        <ModalTemplate visible={submitTask}   body={<UploadTask setVisible={setSubmitTask} id={selected}/>}/>
+        <ModalTemplate visible={reworkTask}   body={<Rework setVisible={setReworkTask} id={selected} />}/>
         <ModalTemplate visible={rateTask}   body={<Rate setVisible={setRateTask}/>}/>
         {/* <View style={tw`mx-2`}>
             <HeadButtons/>
@@ -256,6 +251,7 @@ const overdueCallback=(res)=>{
                     setRework ={setReworkTask} 
                     setRate ={setRateTask} 
                     details = {item}
+                    isMe={true}
                     button1={
                             
                         <TouchableOpacity onPress={()=>handleSelection(item.task_id, item)} style={tw`px-2 rounded-lg w-5/6 border border-blue-900`}>

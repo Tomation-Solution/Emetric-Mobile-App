@@ -99,10 +99,11 @@ export const MemberTasks = async(callback, startTime)=>{
 }
 
 
-export const MemberTasksByEmail = async(email,callback)=>{
+export const MemberTasksByEmail = async(email,callback, startDate)=>{
     // console.log(localStorage.getItem('user_id'))
     try {
-        const response = await api.get(`client/${localStorage.getItem('org_name')}/task/?owner_email=${email}`);
+        const response = startDate? await api.get(`client/${localStorage.getItem('org_name')}/task/?owner_email=${email}&start_date_before=${startDate}`)
+        : await api.get(`client/${localStorage.getItem('org_name')}/task/?owner_email=${email}`)
     //    console.log(localStorage.getItem('uuid')) 
         if (response.status==200) {
             callback(response);
@@ -194,10 +195,10 @@ export const RateTask = async(taskId,callback,formdata,config)=>{
     // console.log(localStorage.getItem('user_id'))
     console.log(formdata)
     try {
-        const response = await api.put(`client/${localStorage.getItem('org_name')}/task/${taskId}/rate`, formdata,config);  
+        const response = await api.put(`client/${localStorage.getItem('org_name')}/task/${taskId}/rate/`, formdata);  
         if (response.status==200) {
             // console.log(response.data.data[0])
-            callback(response.data.data);
+            callback(response);
             
         } else {
           console.log(response.data.status)
@@ -206,6 +207,8 @@ export const RateTask = async(taskId,callback,formdata,config)=>{
         }
     } catch (error) {
         console.error(error)
+        alert(error.response.data.errors[0].message)
+
         // setLoading(false)
 
     }
@@ -218,7 +221,7 @@ export const UploadBulkTask = async(callback,formdata)=>{
     console.log(formdata)
     try {
         const response = await api.post(`client/${localStorage.getItem('org_name')}/task/bulk-add/`, formdata);  
-        if (response.status==200) {
+        if (response.status==200 ||response.status==201 ) {
             console.log(response)
             callback(response.data.data);
             
@@ -229,6 +232,8 @@ export const UploadBulkTask = async(callback,formdata)=>{
         }
     } catch (error) {
         console.error(error)
+        alert(error.response.data.errors[0].message)
+
         // setLoading(false)
 
     }

@@ -5,7 +5,7 @@ import tw from 'tailwind-react-native-classnames'
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons' 
 import FeatherIcon from 'react-native-vector-icons/Feather' 
 import SmartPicker from 'react-native-smart-picker'
-
+import moment from 'moment'
 
 import IconCard from '../../../components/card/iconCard'
 import IconButton from '../../../components/button/IconButton'
@@ -32,6 +32,7 @@ export default function Individual() {
     const [submitTask, setSubmitTask] = useState(false)
     const [reworkTask, setReworkTask] = useState(false)
     const [rateTask, setRateTask] = useState(false)
+    const [showToast, setShowToast] = useState(false)
     const [selected,setSelected] =  useState(null)
     const [selectedTab,setSelectedTab] =  useState(1)
     const [teamMembers, setTeamMembers] =useState(null)
@@ -48,6 +49,7 @@ export default function Individual() {
     const [listData, setListData] = useState(null)
     const [selectedVal, setSelectedVal] = useState('pending')
     const [item, setItem] = useState(null)
+    const [reload, setReload] = useState(false)
 
     const handleChildPress = (income) => {
         setExpanded(!expanded)
@@ -98,14 +100,34 @@ export default function Individual() {
         {id:6, name:'Annual'},
     ]
 
+    let startDate;
+    const today = new Date()
+    if(!filter || filter =='Day'){
+        startDate=moment(today).format('YYYY-MM-DD')
+        // console.log(moment(startDate).format('YYYY-MM-DD'))
+    }else if(filter=='Week'){
+        startDate=moment(today.setDate(today.getDate()+7) ).format('YYYY-MM-DD');
+    }else if(filter=='Month'){
+        startDate=moment(today.setDate(today.getDate()+30) ).format('YYYY-MM-DD');
+    }else if(filter=='Quarter'){
+        startDate=moment(today.setDate(today.getDate()+90) ).format('YYYY-MM-DD');
+    }else if(filter=='Bi-Annual'){
+        startDate=moment(today.setDate(today.getDate()+182) ).format('YYYY-MM-DD');
+    }else if(filter=='Annual'){
+        startDate=moment(today.setDate(today.getDate()+365) ).format('YYYY-MM-DD');
+    }
+
     useEffect(()=>{
         // TeamTasksLists(callback)
         MemberTasks(dashboardCallback)
         if(memberEmail){
+            startDate ?
+            MemberTasksByEmail(memberEmail,callback,startDate)
+            :
             MemberTasksByEmail(memberEmail,callback)
         }
         
-    },[memberEmail])
+    },[memberEmail,filter, reload])
 
     const callback = (res)=>{
         console.log(res.data.data)
@@ -179,8 +201,8 @@ export default function Individual() {
         <ModalTemplate visible={uploadTask}   body={<UploadTask setVisible={setUploadTask}/>}/>
         <ModalTemplate visible={viewTask}   body={<ViewTask setVisible={setViewTask}/>}/>
         <ModalTemplate visible={submitTask}   body={<Submit setVisible={setSubmitTask}/>}/>
-        <ModalTemplate visible={reworkTask}   body={<Rework setVisible={setReworkTask}/>}/>
-        <ModalTemplate visible={rateTask}   body={<Rate setVisible={setRateTask} id={selected}/>}/>
+        <ModalTemplate visible={reworkTask}   body={<Rework setVisible={setReworkTask} id={selected} />}/>
+        <ModalTemplate visible={rateTask}   body={<Rate setVisible={setRateTask} setShowToast={setShowToast} setReload={setReload} details={item} id={selected}/>}/>
         {/* <View style={tw`mx-2`}> */}
         <View style={tw`w-11/12 mb-1 mx-3 flex-row justify-between`}>
            

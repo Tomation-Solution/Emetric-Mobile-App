@@ -10,6 +10,7 @@ import RoundedButton from '../../button/RoundedButton';
 import Input from '../../helpers/Input';
 import { Checkbox, TextInput } from 'react-native-paper';
 import { RateTask } from '../../../actions/actionsTeam';
+import Toast from '../../helpers/Toast';
 
 
 export default function Rate(props) {
@@ -18,7 +19,11 @@ const [action, setAction] = useState(0)
 const navigation = useNavigation()
 const [document, setDocument] =useState(null)
 const [adopt, setAdopt] = useState(false)
+const [showToast, setShowToast] = useState(false)
+const [message, setMessage] = useState(null)
+const [success, setSuccess] = useState(false)
 const [rateScore, setRateScore] =useState(null)
+const [qtyRateScore, setQtyRateScore] =useState(null) 
 const [remark, setRemark] =useState(null)
    
 const _pickDocument = async () => {
@@ -54,10 +59,16 @@ const config = {
 let formData = new FormData();
 // ratingData = formData.append()
 // const convertToFormData=()=>{ 
-    formData.append('quality_target_point_achieved',rateScore)
-    formData.append('rating_remark',JSON.stringify(remark) )   //append the values with key, value pair
+    if(props.details.task_type == 'quantitative' || props.details.task_type == 'qualitative & quantitative'){
+    formData.append('quantity_target_unit_achieved',qtyRateScore)}
+    if(props.details.task_type == 'qualitative' || props.details.task_type == 'qualitative & quantitative'){
+    formData.append('quality_target_point_achieved',rateScore)}
+    formData.append('rating_remark',remark)   //append the values with key, value pair
+    if(!adopt && document){
     // formData.append('submission',document)
-    formData.append('use_owner_submission', 'false')
+    formData.append('submission',{ uri: document, name: document.split('/').pop(), type:'pdf' });
+}
+    formData.append('use_owner_submission', adopt)
 // }
 
 // formData.append("file",{
@@ -69,19 +80,29 @@ let formData = new FormData();
 // const config = {     
 //     headers: { 'content-type': 'application/json' }
 // }
-console.log(remark)
+// console.log(props.details.task_type)
 
 const callback=(res)=>{
-    console.log(res)
+    console.log(res.status==200)
+    setShowToast(true)
+    // setMessage()
+    if(res.status==200){
+        setMessage('Task has been rated')
+        setSuccess(true)
+        props.setVisible(false)
+        props.setReload(true)
+    }
 }
 
 const handleRate=()=>{
     // convertToFormData();
     RateTask(props.id,callback, formData, config)
+    // console.log(formData)
 }
   return (
         action == 0 ?
             <View style={tw`m-auto bg-white rounded-xl w-9/12`}>
+                <Toast showToast={showToast} setShowToast={setShowToast} message={message} success={success} />
                 <View style={tw`border-b border-green-300 my-3 mx-5`}>
                     <Text style={tw`font-bold text-sm text-center py-3 text-blue-800`}>Are you adopting submittted file? </Text>
                 </View>
@@ -97,13 +118,17 @@ const handleRate=()=>{
                 </View>
             </View>:
             <View style={tw`m-auto bg-white rounded-xl w-9/12 px-4`}>
+                <Toast showToast={showToast} setShowToast={setShowToast} message={message} success={success} />
             <View style={tw`border-b border-green-300 my-3 mx-5`}>
                 <Text style={tw`font-bold text-base text-center py-3 text-blue-800`}>Rate Task</Text>
                 {/* <TouchableOpacity onPress={()=>cancel()} style={tw`w-10/12 flex-row justify-end`}>
                     <Ionicon name='close' style={tw` m-2 bg-red-800 p-1.5 my-auto text-center text-white rounded-full text-right`}/>
                 </TouchableOpacity>     */}
             </View>
-            <Input label='Enter rate score (QLY)' setValue={setRateScore} />
+            { props.details.task_type=='qualitative' ||props.details.task_type=='quantitative_and_qualitative' ?
+            <Input label='Enter rate score (QLY)' setValue={setRateScore} />:<></>}
+            { props.details.task_type=='quantitative' ||props.details.task_type=='quantitative_and_qualitative' ?
+            <Input label='Enter rate score (QTY)' setValue={setQtyRateScore} />:<></>}
            { adopt ? <></> : 
             <View style={tw`my-3 `}>
                 <Text style={tw`px-2 text-gray-700 font-bold pb-1.5 my-auto`}>Upload Correct File</Text>
@@ -127,7 +152,7 @@ const handleRate=()=>{
                     <Text style={tw`my-auto text-center`}>Close</Text>
                 </Pressable>
                 <View style={tw`w-5/12`}>
-                    { remark &&rateScore ?
+                    { remark  &&rateScore || qtyRateScore ?
                     <RoundedButton text='Submit' pressed={()=>handleRate()}/>
                     : <Text style={tw`my-auto py-3 bg-gray-200 rounded-3xl text-center`}>Rate Task</Text>
                 }

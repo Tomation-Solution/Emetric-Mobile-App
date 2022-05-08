@@ -29,37 +29,37 @@ const logout=()=>{
                 <View style={tw`px-3 flex-row  justify-between mb-2 `}>
                     <View style={tw`w-6/12`}>
                         <Text style={tw`font-bold text-sm  text-blue-800`}>Owner/ Team</Text>
-                        <Text style={tw`px-1  py-2 text-gray-700`}>emetricsuites2@gmail.com</Text>
+                        <Text style={tw`px-1  py-2 text-gray-700`}>{props.details.upline_initiative.owner.email}</Text>
                     </View>
                     <View style={tw`w-6/12`}>
                         <Text style={tw`font-bold text-sm  text-blue-800`}>Task Assignor</Text>
-                        <Text style={tw`px-1  py-2 text-gray-700`}>emetricsuites2@gmail.com</Text>
+                        <Text style={tw`px-1  py-2 text-gray-700`}>{props.details.upline_initiative.asignor ? props.details.upline_initiative.asignor.email:'None'}</Text>
                     </View>
                     {/* </View> */}
                 </View>
                 <View style={tw`border-b border-blue-300 mb-3 mx-5`}>
                     <Text style={tw`font-bold text-sm  text-blue-800`}>KPI/ Initiative</Text>
-                    <Text>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Dui, urna arcu elementum sed ut gravida adipiscing proin. Arcu, ullamcorper dictum sed id euismod vitae.</Text>
+                    <Text>{props.details.upline_initiative.name}</Text>
                 </View>
                 <View style={tw`px-5 flex-row  justify-between mb-4 `}>
                     <View style={tw`w-5/12`}>
                         <>
                             <Text style={tw`font-bold text-sm  text-blue-800`}>Objective Type</Text>
-                            <Text style={tw`px-1  py-2 text-gray-700`}>Quantitative</Text>
+                            <Text style={tw`px-1  py-2 text-gray-700`}>{props.details.task_type}</Text>
                         </>
                         <>
                             <Text style={tw`font-bold text-sm  text-blue-800`}>Routine Option</Text>
-                            <Text style={tw`px-1  py-2 text-gray-700`}>Daily</Text>
+                            <Text style={tw`px-1  py-2 text-gray-700`}>{props.details.routine_option}</Text>
                         </>
 
                         <>
                             <Text style={tw`font-bold text-sm  text-blue-800`}>Rework Options</Text>
-                            <Text style={tw`px-1  py-3 text-gray-700`}>2</Text>
+                            <Text style={tw`px-1  py-3 text-gray-700`}>{props.details.rework_limit}</Text>
                         </>
 
                         <>
                             <Text style={tw`font-bold text-sm  text-blue-800`}>Start Date & Time</Text>
-                            <Text style={tw`px-1  py-3 text-gray-700`}>2022-04-22, 09:00:00</Text>
+                            <Text style={tw`px-1  py-3 text-gray-700`}>{props.details.start_date +' '+props.details.start_time}</Text>
                         </>
                     </View>
                     
@@ -70,12 +70,12 @@ const logout=()=>{
                         </>
                         <>
                             <Text style={tw`font-bold text-sm  text-blue-800`}>Duration</Text>
-                            <Text style={tw`px-1  py-3 text-gray-700`}>00:25:00</Text>
+                            <Text style={tw`px-1  py-3 text-gray-700`}>{props.details.duration}</Text>
                         </>
 
                         <>
                             <Text style={tw`font-bold text-sm  text-blue-800`}>End Time</Text>
-                            <Text style={tw`px-1  py-3 text-gray-700`}>2022-04-22, 09:00:00</Text>
+                            <Text style={tw`px-1  py-3 text-gray-700`}>{props.details.end_date}</Text>
                         </>
 
                        

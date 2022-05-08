@@ -1,4 +1,4 @@
-import { View, SafeAreaView, ScrollView, StatusBar, Platform,Text } from 'react-native'
+import { View, SafeAreaView, ScrollView, Pressable,StatusBar, Platform,Text } from 'react-native'
 import React, {useState} from 'react'
 import tw from 'tailwind-react-native-classnames'
 import Ionicon from 'react-native-vector-icons/Ionicons'
@@ -29,11 +29,11 @@ export default function Task({navigation}) {
   const handletabPress =(index, to)=>{
     // setSelected(index)
     if(index==2 ){
-      setSelected(index)
+      // setSelected(index)
       setAddTask(true)
       // alert('yo')
     }else if(index==3){
-      setSelected(index)
+      // setSelected(index)
       setUploadTask(true)
     }else{
       setSelected(index)
@@ -47,7 +47,7 @@ export default function Task({navigation}) {
         {Platform.OS == 'android'?
         <StatusBar/>:<></>    
     }
-    <ModalTemplate visible={addTask}  body={<AddTask setVisible={setAddTask}/>}/>
+    <ModalTemplate visible={addTask}  body={<AddTask setVisible={setAddTask} navigation={navigation} />}/>
     <ModalTemplate visible={uploadTask}   body={<UploadTask setVisible={setUploadTask}/>}/>
 
     <TobBar
@@ -66,7 +66,7 @@ export default function Task({navigation}) {
       { localStorage.getItem('user_role') !='team_lead' && localStorage.getItem('user_role') !='admin'?<></>:
       <TabbedButton text='Team Tasks' index={1} selected={selected} pressed={()=>handletabPress(1, 'team-task')} />}
       { localStorage.getItem('user_role') !='team_lead' && localStorage.getItem('user_role') !='admin'?<></>:
-      <TabbedButton text='AddTask' index={2} selected={selected} pressed={()=>handletabPress(2, 'corporate')}/>}
+      <TabbedButton text='Add Task' index={2} selected={selected} pressed={()=>handletabPress(2, 'corporate')}/>}
       { localStorage.getItem('user_role') !='team_lead' && localStorage.getItem('user_role') !='admin'?<></>:
       <TabbedButton text='Upload Task' index={3} selected={selected} pressed={()=>handletabPress(3, 'corporate')}/>}
     </View>

@@ -6,6 +6,9 @@
     "assetBundlePatterns": [
       "**/*"
     ],
-    "description": ""
+    "description": "",
+    "ios": {
+      "bundleIdentifier": "org.name.emetricsuite"
+    }
   }
 }

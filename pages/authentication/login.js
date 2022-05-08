@@ -13,7 +13,7 @@ import Ionicon from 'react-native-vector-icons/Ionicons'
 
 export default function Login ({navigation}) {
 
-  const [showPassword, setShowPassword] = useState(false)
+  const [showPassword, setShowPassword] = useState(true)
   const [loading, setLoading] = useState(false)
   const [signInData, setSignInData] = useState({
     org_name:'',
@@ -24,7 +24,7 @@ export default function Login ({navigation}) {
   const data ={'email':signInData.email, 'password':signInData.password}
   const handleLogin =()=>{
     setLoading(true)
-    LoginUser(data, signInData.org_name, callback)
+    LoginUser(data, signInData.org_name, callback, setLoading)
   }
 
   const callback=(response)=>{
@@ -37,7 +37,7 @@ export default function Login ({navigation}) {
       }
   }
 
-  console.log(signInData)
+  // console.log(signInData)
 
   return (
     <SafeAreaView style={tw`h-full `}>
@@ -88,10 +88,15 @@ export default function Login ({navigation}) {
               </TouchableOpacity>
          
           <View style={tw`my-2`}>
+            {loading || !signInData.email  || !signInData.org_name || !signInData.password  ?
+            <View style={tw`bg-blue-100 rounded-lg my-auto mx-auto text-center py-2.5 w-11/12`}>
+            <Text style={tw` text-center  text-blue-900`}>{loading? 'Loading': 'Login'}</Text>
+            </View>
+            :
             <RoundedButton 
-              text={loading ?'loading ...':'Login'}
+              text='Login'
               pressed={()=>handleLogin()}
-            />
+            />}
           </View>
           {/* <TouchableOpacity onPress={()=>navigation.navigate('forgotPassword')}> 
             <Text style={tw`text-xs`}>Forgot Password?</Text>
