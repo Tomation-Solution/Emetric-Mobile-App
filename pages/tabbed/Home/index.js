@@ -4,6 +4,7 @@ import tw from 'tailwind-react-native-classnames'
 import Ionicon from 'react-native-vector-icons/Ionicons'
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons'
 import { createStackNavigator } from '@react-navigation/stack';
+import localStorage from 'react-native-sync-localstorage'
 
 import DueCard from '../../../components/card/dueCard'
 import IconCard from '../../../components/card/iconCard'
@@ -24,7 +25,7 @@ export default function Home({navigation}) {
     setSelected(index)
     navigation.navigate(to)
   }
-
+// console.log(localStorage.getItem('userInfo').role[0])
   return (
     <SafeAreaView style={tw`h-full`}>
         {Platform.OS == 'android'?
@@ -35,24 +36,30 @@ export default function Home({navigation}) {
         body={
             <View style={tw`flex-row justify-between px-2 py-3 bg-gray-100`}>
                 <Ionicon name='menu' onPress={()=>navigation.toggleDrawer()} size={23} />
-                <Text style={tw`font-bold`}>Debo's Dashboard</Text>
+                <Text style={tw`font-bold`}>{localStorage.getItem('first_name')} Dashboard</Text>
                 <Ionicon name='md-notifications' size={20} />
-
             </View>
         }
     />
 
     <View style={tw`flex-row justify-between px-4 mb-1`}>
       <TabbedButton text='Individual' index={0} selected={selected} pressed={()=>handletabPress(0, 'individual')}/>
+      { localStorage.getItem('user_role') !='team_lead' && localStorage.getItem('user_role') !='admin'?<></>:
+      <View style={tw`flex-row justify-between w-6/12`}>
       <TabbedButton text='Team' index={1} selected={selected} pressed={()=>handletabPress(1, 'team')} />
       <TabbedButton text='Corporate' index={2} selected={selected} pressed={()=>handletabPress(2, 'corporate')}/>
-    </View>
+      </View>
+    }</View>
     {/* <View style={tw`h-20`}> */}
       <Stack.Navigator screenOptions={{headerShown:false}} initialRouteName='individual'>
         <Stack.Screen name='individual' component={Individual} />
-        <Stack.Screen name='team' component={Team} />
-        <Stack.Screen name='corporate' component={Corporate} />
+        { localStorage.getItem('user_role') !='team_lead' && localStorage.getItem('user_role') !='admin'?<></>:
+        <Stack.Screen name='team' component={Team} />}
+        { localStorage.getItem('user_role') !='team_lead' && localStorage.getItem('user_role') !='admin'?<></>:
+        <Stack.Screen name='corporate' component={Corporate} />}
       </Stack.Navigator>
+<Text style={tw`text-red-900`}>{localStorage.getItem('userInfo'.email)}</Text>
+
     {/* </View> */}
 
     {/* <Search /> */}

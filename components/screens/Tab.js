@@ -2,6 +2,7 @@ import { View, Text } from 'react-native'
 import React from 'react'
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Ionicon from 'react-native-vector-icons/Ionicons'
+import tw from 'tailwind-react-native-classnames';
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons'
 import Home from '../../pages/tabbed/Home';
 import Task from '../../pages/tabbed/task';
@@ -16,7 +17,12 @@ const Chat=()=>{
 }
 const MyAccount=()=>{
     return(
-        <Text>Home</Text>
+      <View style={tw`h-full my-auto text-center w-full`}>
+          <View style={tw`m-auto`}>
+          <MaterialIcon style={tw`text-gray-400 text-center py-3`} name='airplanemode-inactive' size={40}/>
+          <Text style={tw`  text-center`}>Page Not Available Yet</Text>
+          </View>
+        </View>
     )
 }
 const Members=()=>{

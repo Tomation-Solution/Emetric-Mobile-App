@@ -1,31 +1,57 @@
 import { ScrollView,View, FlatList, Picker, Text } from 'react-native'
-import React, {useState} from 'react'
+import React, {useState, useEffect} from 'react'
 import tw from 'tailwind-react-native-classnames'
-import MaterialIcon from 'react-native-vector-icons/MaterialIcons' 
-import FeatherIcon from 'react-native-vector-icons/Feather' 
-import SmartPicker from 'react-native-smart-picker'
+import localStorage from 'react-native-sync-localstorage'
 
 import IconCard from '../../../components/card/iconCard'
-import IconButton from '../../../components/button/IconButton'
-import { TaskCard } from '../../../components/card/TaskCard'
-import { TouchableOpacity } from 'react-native-gesture-handler'
 import ModalTemplate from '../../../components/modal'
-import AddTask from '../../../components/modal/AddTask'
-import UploadTask from '../../../components/modal/UploadTask'
 import RoundedButton from '../../../components/button/RoundedButton'
 import { PerformanceCard } from '../../../components/card/PerformanceCard'
 import ViewPerformance from '../../../components/modal/ViewPerformance'
+import { MyPerformance, MyPerformanceDash } from '../../../actions/actions'
+import { setSelectedLog } from 'react-native/Libraries/LogBox/Data/LogBoxData'
 
 export default function Individual() {
 
     const [view, setView] = useState(false)
+    const [dashboardData, setDashboardData] = useState({
+        mop:0, mjql:0, mjqt:0,mttt:0
+    })
+    const [selectedLog, setSelectedLog] = useState(null)
+    const [allData, setAllData] = useState(null)
+    useEffect(()=>{
+        MyPerformance(callback)
+        MyPerformanceDash(dashCallback)
+    },[])
+
+    const dashCallback=(response)=>{
+        console.log(response)
+        setDashboardData({
+            mop:response.data.data.map(e=>e.percentage_cumulative_target_point_achieved),
+            mjql:response.data.data.map(e=>e.percentage_cumulative_quality_target_point_achieved),
+            mjqt:response.data.data.map(e=>e.percentage_cumulative_quantity_target_point_achieved),
+            mttt:response.data.data.map(e=>e.percentage_cumulative_turn_around_time_target_point_achieved),
+        })
+    }
+    const callback =(res)=>{
+        // console.log(res)
+        
+        setAllData(res.data.data)
+    }
+
+    console.log(localStorage.getItem('uuid'))
     // const [uploadTask, setUploadTask] = useState(false)
     const data = [
-        {id:1, name:'My Overall Performance', value:'2 %'},
-        {id:2, name:'My Job Quality Performance', value:'45 %'},
-        {id:3, name:'My Job Quantity Performance', value:'5 %'},
-        {id:4, name:'My Turnaround Time Performance', value:'3 %'}
+        {id:1, name:'My Overall Performance', value:dashboardData.mop, percent:true},
+        {id:2, name:'My Job Quality Performance', value:dashboardData.mjql, percent:true},
+        {id:3, name:'My Job Quantity Performance', value:dashboardData.mjqt, percent:true},
+        {id:4, name:'My Turnaround Time Performance', value:dashboardData.mttt, percent:true}
     ]
+
+    const handleView =(data)=>{
+        setView(true)
+        setSelectedLog(data)
+    }
 
     const HeadButtons =()=>{
         return(
@@ -35,6 +61,7 @@ export default function Individual() {
                         width={true}
                         key={e.id}
                         amount={e.value}
+                        percent={e.percent}
                         description={e.name}
                         bg='bg-blue-100'
                     />)
@@ -47,29 +74,12 @@ export default function Individual() {
         )
     }
 
-    const BottomComponents = () =>{
-        return(
-            <View style={tw`mt-3`}>
-        
-                { data.map(e=>
-                    <PerformanceCard name='Responsibilities For The Day To Day Relationship Managment of Chanel Patners Demo 1@gmail.com' 
-                    time='2022- 04-22 08:00:00' 
-                    status='awating rating' 
-                    button1={
-                    <View style={tw`w-14`}>
-                        <RoundedButton text='View'/>
-                    </View>}
-                />)}
-            </View>
-        )
-    }
-
   return (
     <View>
-        <ModalTemplate visible={view}  body={<ViewPerformance setVisible={setView}/>}/>
+        <ModalTemplate visible={view}  body={<ViewPerformance setVisible={setView} data={selectedLog}/>}/>
         {/* <ModalTemplate visible={uploadTask}   body={<UploadTask setVisible={setUploadTask}/>}/> */}
         <FlatList
-            data={data}
+            data={allData ? allData : ''}
             keyExtractor={(item)=>item.id}
             
             ListHeaderComponent={<HeadButtons/>}
@@ -77,12 +87,11 @@ export default function Individual() {
             renderItem={
                 ({item})=>
                 <View style={tw`justify-around`}>
-                    <PerformanceCard name='Responsibilities For The Day To Day Relationship Managment of Chanel Patners Demo 1@gmail.com' 
-                    time='2022- 04-22 08:00:00' 
-                    status='awating rating' 
+                    <PerformanceCard name={item.name} 
+                    
                     button1={
                     <View style={tw`w-14`}>
-                        <RoundedButton pressed={()=>setView(true)} text='View'/>
+                        <RoundedButton pressed={()=>handleView(item)} text='View'/>
                     </View>}
                 />
                 </View>

@@ -1,5 +1,7 @@
 import { View, SafeAreaView,Text, Image, TextInput,TouchableOpacity } from 'react-native'
 import {useState} from 'react'
+// import localStorage from 'react-native-sync-localstorage'
+
 import tw from 'tailwind-react-native-classnames'
 import RoundedButton from '../../components/button/RoundedButton'
 import ModalTemplate from '../../components/button/RoundedButton'
@@ -7,56 +9,42 @@ import { LoginUser } from '../../actions/actions'
 import Ionicon from 'react-native-vector-icons/Ionicons'
 
 
-const OwingWidget=()=>{
-  const [checked, setChecked] = useState(false)
 
-
-  return(
-    <View style={tw`bg-white mx-10 px-5 py-5 my-auto rounded-2xl`}>
-      <Text style={tw`text-center mb-1`}> ACCOUNT LOCKED</Text>
-      <Text style={tw`text-xs my-2`}>Pay outstanding fee to gain access to account</Text>
-      <View style={tw`flex-row justify-between my-2`}>
-        <Text>TOTAL OUTSTANDING: </Text>
-        <Text>N 120,000 </Text>
-      </View>
-
-      <View style={tw`flex-row justify-between my-4`}>
-        <Text style={tw`text-xs `}>Pay partial amount of Total outstanding</Text>
-        {checked ? 
-        <Ionicon name='checkbox' size={20} onPress={()=>setChecked(!checked)}/> : 
-        <Ionicon name='ios-square-outline' size={20} onPress={()=>setChecked(!checked)}/>
-      }
-      
-      </View>
-      { checked ?
-        <View style={tw`border-b  mb-2`  }> 
-        <TextInput 
-          placeholder='Enter Amount you want to pay'
-        />
-      </View>:<></>}
-      <View style={tw`w-5/12 mx-auto`}>
-        
-        <RoundedButton text='Pay'/>
-      </View>
-      
-    </View>
-  )
-}
 
 export default function Login ({navigation}) {
 
-  const [showPassword, setShowPassword] = useState(false)
-
+  const [showPassword, setShowPassword] = useState(true)
+  const [loading, setLoading] = useState(false)
+  const [signInData, setSignInData] = useState({
+    org_name:'',
+    email:'',
+    password:''
+  })
+  
+  const data ={'email':signInData.email, 'password':signInData.password}
   const handleLogin =()=>{
-    LoginUser('emmaldini12+janedoe@gmail.com','password')
+    setLoading(true)
+    LoginUser(data, signInData.org_name, callback, setLoading)
   }
 
+  const callback=(response)=>{
+      if(response.status==200){
+        setLoading(false)
+        navigation.navigate('dashboard')
+      }else{
+        setMessage(response.message)
+        setLoading(false)
+      }
+  }
+
+  // console.log(signInData)
 
   return (
     <SafeAreaView style={tw`h-full `}>
       <View style={tw`my-auto`}>
       {/* <ModalTemplate body={<OwingWidget/>} /> */}
       <Image style={tw`mx-auto my-8`} source={require('../../images/Logo/logo.png')}/>
+      {/* <Text>{localStorage.getItem('tokens').access}</Text> */}
       <View style={tw`mx-10`}>
          <Text style={tw`text-base text-blue-900 font-bold pb-3`}>Login to Your Organization</Text>
           <Text>Input details to get started as admin</Text>
@@ -67,7 +55,7 @@ export default function Login ({navigation}) {
           <View>
               <View style={tw`my-3`}>
                 <Text >Organization Name</Text>
-                <TextInput
+                <TextInput onChangeText={(text)=>setSignInData({...signInData, org_name:text})}
                 placeholder='Organization Name'
                 style={tw`py-2 px-2 bg-gray-200 rounded-lg mt-1.5`}
                 />
@@ -75,7 +63,7 @@ export default function Login ({navigation}) {
 
               <View style={tw`my-2`}>
                 <Text>Username</Text>
-                <TextInput
+                <TextInput onChangeText={(text)=>setSignInData({...signInData, email:text})}
                 placeholder='Username'
                 style={tw`py-2 px-2 bg-gray-200 rounded-lg mt-1.5`}
                 />
@@ -84,7 +72,7 @@ export default function Login ({navigation}) {
               <View style={tw`my-2 `}>
                 <Text>Password</Text>
                 <View style={tw`flex-row px-1 bg-gray-200 my-2 py-0.5 rounded-lg`}>
-                  <TextInput
+                  <TextInput onChangeText={(text)=>setSignInData({...signInData, password:text})}
                   placeholder='Password'
                   style={tw`py-1 w-11/12 px-2 bg-gray-200 rounded-lg mt-1.5`}
                   secureTextEntry={showPassword ? true: false}
@@ -100,10 +88,15 @@ export default function Login ({navigation}) {
               </TouchableOpacity>
          
           <View style={tw`my-2`}>
+            {loading || !signInData.email  || !signInData.org_name || !signInData.password  ?
+            <View style={tw`bg-blue-100 rounded-lg my-auto mx-auto text-center py-2.5 w-11/12`}>
+            <Text style={tw` text-center  text-blue-900`}>{loading? 'Loading': 'Login'}</Text>
+            </View>
+            :
             <RoundedButton 
               text='Login'
               pressed={()=>handleLogin()}
-            />
+            />}
           </View>
           {/* <TouchableOpacity onPress={()=>navigation.navigate('forgotPassword')}> 
             <Text style={tw`text-xs`}>Forgot Password?</Text>

@@ -1,10 +1,10 @@
 import { ScrollView,View, FlatList, Picker, Text } from 'react-native'
-import {Portal} from 'react-native-paper'
-import React, {useState} from 'react'
+import {List, Portal} from 'react-native-paper'
+import React, {useState, useEffect} from 'react'
 import tw from 'tailwind-react-native-classnames'
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons' 
 import FeatherIcon from 'react-native-vector-icons/Feather' 
-import SmartPicker from 'react-native-smart-picker'
+import moment from 'moment'
 
 
 import IconCard from '../../../components/card/iconCard'
@@ -20,6 +20,9 @@ import Rate from '../../../components/modal/task/Rate'
 import Rework from '../../../components/modal/task/Rework'
 import TabbedButton from '../../../components/button/TabbedButton'
 import SubTabButton from '../../../components/button/SubTabButton'
+import { setWarningFilter } from 'react-native/Libraries/LogBox/Data/LogBoxData'
+import { UserTaskInfo, UserTasksByEmail, UserTasksByStatus } from '../../../actions/actions'
+import { or } from 'react-native-reanimated'
 
 export default function Individual({navigation}) {
 
@@ -33,47 +36,149 @@ export default function Individual({navigation}) {
     const [selected,setSelected] =  useState(null)
     const [selectedTab,setSelectedTab] =  useState(1)
     const [portalId, setPortalId] =useState(null)
+    const [expanded, setExpanded] = React.useState(false);
+    const handlePress = () => setExpanded(!expanded);
+    const [filter, setFilter] = useState(null)
+    const [nPending, setNPending] = useState(0)
+    const [overdue, setOverdue] = useState(0)
+    const [taskInfo, setTaskInfo] = useState(null)
+    const [details, setDetails] = useState(null)
+    const [pending, setPending] = useState(0)
+    const [status, setStatus] = useState('pending')
+    const [statusName, setStatusName] = useState('pending')
+    
+    const [stats, setStats] = useState({
+        pending:0, active:0, over_due:0, closed:0, 
+        rework:0, rework_over_due:0, awaiting_rating:0
+    })
+
+
     const data = [
-        {id:1, name:'My Pending Task', value:2},
-        {id:2, name:'My Active Task', value:4},
-        {id:3, name:'My Overdue Task', value:5},
-        {id:4, name:'My Completed Task', value:3}
+        {id:1, name:'My Pending Task', value:nPending},
+        {id:2, name:'My Active Task', value:stats.active},
+        {id:3, name:'My Overdue Task', value:overdue},
+        {id:4, name:'My Completed Task', value:stats.closed}
     ]
 
     const tabData = [
-        {id:1, name:'Pending', value:2},
-        {id:2, name:'Active', value:4},
-        {id:3, name:'Overdue', value:5},
-        {id:4, name:'Awaiting Rating', value:3},
-        {id:5, name:'Rework', value:3},
-        {id:6, name:'Rework Overdue', value:3},
-        {id:7, name:'Closed', value:3}
+        {id:1, name:'Pending',status:'pending',  value:2},
+        {id:2, name:'Active',status:'active', value:4},
+        {id:3, name:'Overdue',status:'over_due', value:5},
+        {id:4, name:'Awaiting Rating',status:'awaiting_rating', value:3},
+        {id:5, name:'Rework', status:'rework',value:3},
+        {id:6, name:'Rework Overdue', status:'rework_over_due', value:3},
+        {id:7, name:'Closed', status:'closed',value:3}
     ]
 
-    const cardData = [
-        {id:1, name:'Responsibilities For The Day To Day Relationship Managment of Chanel Patners Demo 1@gmail.com', time:'2022- 04-22 08:00:00', status:'Pending'},
-        {id:2, name:'Responsibilities For The Day To Day Relationship Managment of Chanel Patners Demo 1@gmail.com', time:'2022- 04-22 08:00:00', status:'Pending'},
-        {id:3, name:'Responsibilities For The Day To Day Relationship Managment of Chanel Patners Demo 1@gmail.com', time:'2022- 04-22 08:00:00', status:'Pending'},
-        {id:4, name:'Responsibilities For The Day To Day Relationship Managment of Chanel Patners Demo 1@gmail.com', time:'2022- 04-22 08:00:00', status:'Pending'},
-        {id:5, name:'Responsibilities For The Day To Day Relationship Managment of Chanel Patners Demo 1@gmail.com', time:'2022- 04-22 08:00:00', status:'Awaiting Rating'},
-       
+    
+
+    const filterData=[
+        {id:1, name:'Day'},
+        {id:2, name:'Week'},
+        {id:3, name:'Month'},
+        {id:4, name:'Quarter'},
+        {id:5, name:'Bi-Annual'},
+        {id:6, name:'Annual'},
     ]
 
-    // const HeadButtons =()=>{
-    //     return(
-    //         <View style={tw`flex-row justify-end`}>
-    //             <View style={tw`mx-2`}>
-    //                 <IconButton pressed={()=>setAddTask(true)} text='Add Task' textColor='text-white' bg='bg-blue-900' icon={<MaterialIcon name='add' color='white' size={20}/>}/>
-    //             </View>
-    //             <IconButton pressed={()=>  setUploadTask(true)} text='Upload Task' border='border' borderColor='border-blue-900' textColor='text-blue-900'  icon={<MaterialIcon name='add' color='blue' size={20}/>}/>
-    //         </View>
-    //     )
-    // }
 
+
+
+    const handleChildPress = (income) => {
+        setExpanded(!expanded)
+        setFilter(income.name)
+    };
+
+    const callback=(response)=>{
+        setTaskInfo(response.data.data)
+        // console.log(response.data.data.map(e=>e.task_status=='pending').length)
+        setPending(response.data.data.map(e=>e.task_status=='pending').length)
+        setStats({...stats, 'pending':response.data.data.map(e=>e.task_status=='pending').length})
+    }
+
+    const taskCallback=(response)=>{
+        console.log(response.data.data.map(e=>e.task_status=='pending'))
+        setStats({
+         pending: response.data.data.filter(e=>e.task_status=='pending').length,
+         active: response.data.data.filter(e=>e.task_status=='active').length,
+         awaiting_rating: response.data.data.filter(e=>e.task_status=='awaiting_rating').length,
+         over_due: response.data.data.filter(e=>e.task_status=='over_due').length,
+         closed: response.data.data.filter(e=>e.task_status=='closed').length,
+         rework: response.data.data.filter(e=>e.task_status=='rework').length,
+         rework_over_due: response.data.data.filter(e=>e.task_status=='rework_over_due').length,
+ 
+        }) 
+     } 
+
+const handleStatus =(index, name,status_name)=>{
+    setTaskInfo(null)
+    setSelectedTab(index)
+    setStatusName(status_name)
+    setStatus(name)
+}
+
+const pendingCallback=(res)=>{
+    // console.log(res.data.count)
+    setNPending(res.data.count)
+}
+const activeCallback=(res)=>{
+    console.log(res.data.count)
+    // set
+}
+const overdueCallback=(res)=>{
+    // console.log(res.data.count)
+    setOverdue(res.data.count)
+}
+    // console.log(taskInfo[0])
+    let startDate;
+    const today = new Date()
+    if(!filter || filter =='Day'){
+        startDate=moment(today).format('YYYY-MM-DD')
+        // console.log(moment(startDate).format('YYYY-MM-DD'))
+    }else if(filter=='Week'){
+        startDate=moment(today.setDate(today.getDate()+7) ).format('YYYY-MM-DD');
+    }else if(filter=='Month'){
+        startDate=moment(today.setDate(today.getDate()+30) ).format('YYYY-MM-DD');
+    }else if(filter=='Quarter'){
+        startDate=moment(today.setDate(today.getDate()+90) ).format('YYYY-MM-DD');
+    }else if(filter=='Bi-Annual'){
+        startDate=moment(today.setDate(today.getDate()+182) ).format('YYYY-MM-DD');
+    }else if(filter=='Annual'){
+        startDate=moment(today.setDate(today.getDate()+365) ).format('YYYY-MM-DD');
+    }
+    console.log(moment(today).format('YYYY-MM-DD'))
+    useEffect(()=>{
+        if(startDate){
+            UserTasksByStatus('over_due', overdueCallback, startDate, moment(today).format('YYYY-MM-DD'))
+            UserTasksByStatus('pending', pendingCallback, startDate, moment(today).format('YYYY-MM-DD'))
+            // UserDashboard(callback)
+            UserTasksByStatus(status,callback, startDate, moment(today).format('YYYY-MM-DD'))
+            UserTasksByEmail(taskCallback, startDate, moment(today).format('YYYY-MM-DD'))
+        }else{
+        UserTasksByStatus('over_due', overdueCallback)
+        UserTasksByStatus('pending', pendingCallback)
+        // UserDashboard(callback)
+        UserTasksByStatus(status,callback)
+        UserTasksByEmail(taskCallback)
+        
+        UserTasksByStatus('active', activeCallback)}
+
+    },[selectedTab, filter])
 
     const HeadComponent =()=>{
         return(
         <View>
+            <View style={tw`w-5/12`}>
+                    <List.Accordion style={tw`w-full`} expanded={expanded}
+        onPress={handlePress} titleNumberOfLines={1}  title={!filter ?'Filter':filter}>
+                    {filterData.map((e)=>
+                    <List.Item key={e.id} title={e.name} onPress={()=>handleChildPress(e)}/>)}
+                    {/* <List.Item title='Week'/>
+                    <List.Item title='Month'/>
+                    <List.Item title='Quarter'/>
+                    <List.Item title='Bi-Annual'/>
+                    <List.Item title='Annual'/> */}
+                    </List.Accordion></View>
             <View style={tw`flex-row flex-wrap justify-between `}>
                 { data.map(e=>
                     <IconCard
@@ -92,8 +197,8 @@ export default function Individual({navigation}) {
                 >
                     {tabData.map((e,index)=>
                     // <ScrollView horizontal style={tw`w-full`}>
-                    <SubTabButton text={e.name} 
-                    pressed={()=>setSelectedTab(e.id)} 
+                    <SubTabButton text={e.name} key={e.id}
+                    pressed={()=>handleStatus(e.id,e.status, e.name)} 
                     selected={selectedTab} index={e.id} />
                     // </ScrollView>
                     )}
@@ -103,26 +208,29 @@ export default function Individual({navigation}) {
         )
     } 
 
-    const handleSelection =(id)=>{
+    const handleSelection =(id, item)=>{
         if(id==selected){
             setSelected(null)
         }else{
             setSelected(id)
+            setDetails(item)
         }
     }
+    // console.log(org)
   return (
     <View style={tw`h-full`}>
         <ModalTemplate visible={addTask}  body={<AddTask setVisible={setAddTask}/>}/>
         <ModalTemplate visible={uploadTask}   body={<UploadTask setVisible={setUploadTask}/>}/>
-        <ModalTemplate visible={viewTask}   body={<ViewTask setVisible={setViewTask}/>}/>
-        <ModalTemplate visible={submitTask}   body={<UploadTask setVisible={setSubmitTask}/>}/>
-        <ModalTemplate visible={reworkTask}   body={<Rework setVisible={setReworkTask}/>}/>
+        <ModalTemplate visible={viewTask}   body={<ViewTask setVisible={setViewTask} details={details} />}/>
+        <ModalTemplate visible={submitTask}   body={<UploadTask setVisible={setSubmitTask} id={selected}/>}/>
+        <ModalTemplate visible={reworkTask}   body={<Rework setVisible={setReworkTask} id={selected} />}/>
         <ModalTemplate visible={rateTask}   body={<Rate setVisible={setRateTask}/>}/>
         {/* <View style={tw`mx-2`}>
             <HeadButtons/>
         </View> */}
         <FlatList
-            data={cardData.filter(e=>e.status=='Pending').map(e=>e)}
+            // data={cardData.filter(e=>e.status=='Pending').map(e=>e)}
+            data={taskInfo}
             keyExtractor={(item)=>item.id}
             ListHeaderComponent={<HeadComponent/>}
             style={tw`p-5 bg-gray-100`}
@@ -133,18 +241,20 @@ export default function Individual({navigation}) {
                    
 
                     <TaskCard name={item.name}
-                    time={item.time}
-                    status={item.status}
-                    id={item.id}
+                    time={item.start_date + ' ' + item.start_time}
+                    status={item.task_status}
+                    id={item.task_id}
                     selected ={selected} 
                     setSelected ={setSelected} 
                     setView ={setViewTask} 
                     navigation={navigation}
                     setRework ={setReworkTask} 
                     setRate ={setRateTask} 
+                    details = {item}
+                    isMe={true}
                     button1={
                             
-                        <TouchableOpacity onPress={()=>handleSelection(item.id)} style={tw`px-2 rounded-lg w-5/6 border border-blue-900`}>
+                        <TouchableOpacity onPress={()=>handleSelection(item.task_id, item)} style={tw`px-2 rounded-lg w-5/6 border border-blue-900`}>
                             <FeatherIcon size={20} name='more-horizontal'/>
                         </TouchableOpacity>
                     

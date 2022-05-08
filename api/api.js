@@ -1,10 +1,14 @@
 import axios from 'axios';
 import localStorage from 'react-native-sync-localstorage'
 
-const URL = 'https://emetric-suite-revamp.herokuapp.com';
+const URL = 'https://emetric-suite-backend.herokuapp.com/'
 
 const instance = axios.create({
   baseURL: URL,
+  // ​headers: {
+  //   ​'Content-Type': 'application/json',
+  //   '​accept': 'application/json'
+  // ​},
 });
 
 instance.interceptors.request.use((config) => {
@@ -15,25 +19,16 @@ instance.interceptors.request.use((config) => {
   return config;
 });
 
-instance.interceptors.response.use(response => {
-  return response;
-}, error => {
- if (error.response.status === 401) {
-  //place your reentry code
-  alert('You are not authorized')
- }
- return error;
-});
-// instance.interceptors.response.use((response) => {
-
-//   if(response.status === 401) {
-//       alert("You are not authorized");
-//     }
+// instance.interceptors.response.use(response => {
 //   return response;
-// });
+// }, error => {
+//  if (error.response.status === 401) {
+//   //place your reentry code
+//   alert('You are not authorized')
+//  }else{
+//   error.message
 
-// if(response.status === 401) {
-//   alert("You are not authorized");
-// }
-// return response;
+//  }
+//  return error;
+// });
 export default instance;

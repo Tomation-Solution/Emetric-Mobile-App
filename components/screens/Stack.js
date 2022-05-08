@@ -13,6 +13,7 @@ import SubmiTask from '../../pages/others/submiTask';
 import ConfirmCode from '../../pages/authentication/confirmCode';
 import SetNewPassword from '../../pages/authentication/setNewPassword';
 import ChangedPassword from '../../pages/authentication/changedPassword';
+import Onboard from '../../pages/others/onboard';
 
 
 const StackScreen =createStackNavigator()
@@ -22,14 +23,16 @@ export default function Stack() {
   return (
     // <NavigationContainer>
       <StackScreen.Navigator screenOptions={{headerShown:false}} >
+          <StackScreen.Screen name='onboard' component={Onboard}/>
           <StackScreen.Screen name='login' component={Login}/>
-          <StackScreen.Screen  name='register' component={Register}/>
+          <StackScreen.Screen  name='forgotPassword' component={Register}/>
           <StackScreen.Screen  name='changedPassword' component={ChangedPassword}/>
           <StackScreen.Screen name='members' component={Members}/>
           <StackScreen.Screen name='submitTask' component={SubmiTask}/>
           <StackScreen.Screen name='confirmCode' component={ConfirmCode}/>
           <StackScreen.Screen name='setNewPassword' component={SetNewPassword}/>
           <StackScreen.Screen name='dashboard' component={Drawer}/>
+          {/* <StackScreen.Screen name='task' component={Tas}/> */}
               {/* {()=>(TabScreen)
 
               }

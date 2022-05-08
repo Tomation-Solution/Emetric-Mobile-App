@@ -34,7 +34,7 @@ export default function HPM({navigation}) {
     <TobBar
         body={
             <View style={tw`flex-row justify-between px-2 py-3 bg-gray-100`}>
-                <Ionicon name='menu' onPress={()=>navigation.toggleDrawer()} size={23} />
+                <Ionicon name='md-chevron-back' onPress={()=>navigation.navigate('Home')} size={23} />
                 <Text style={tw`font-bold`}>Debo's Dashboard</Text>
                 <Ionicon name='md-notifications' size={20} />
 
@@ -44,21 +44,21 @@ export default function HPM({navigation}) {
     <View >
       <ScrollView showsHorizontalScrollIndicator={false} horizontal={true} style={tw`flex-row  px-4 mb-1`}>
         <View style={tw`mr-4`}>
-          <TabbedButton text='My  Performance' index={0} selected={selected} pressed={()=>handletabPress(0, 'individual')}/>
+          <TabbedButton text='My  Performance' index={0} selected={selected} pressed={()=>handletabPress(0, 'individual-perf')}/>
         </View>
         <View style={tw`mr-4`}>
-          <TabbedButton text='Team Performance' index={1} selected={selected} pressed={()=>handletabPress(1, 'team')} />
+          <TabbedButton text='Team Performance' index={1} selected={selected} pressed={()=>handletabPress(1, 'team-perf')} />
         </View>
         <View style={tw`mr-10`}>
-          <TabbedButton text='Individul Team Performance' index={2} selected={selected} pressed={()=>handletabPress(2, 'individualTeam')}/>
+          <TabbedButton text='Individual Team Performance' index={2} selected={selected} pressed={()=>handletabPress(2, 'individualTeam-perf')}/>
         </View>
     </ScrollView>
     </View>
     {/* <View style={tw`h-20`}> */}
       <Stack.Navigator screenOptions={{headerShown:false}} initialRouteName='individual'>
-        <Stack.Screen name='individual' component={Individual} />
-        <Stack.Screen name='team' component={Team} />
-        <Stack.Screen name='individualTeam' component={individualTeam} />
+        <Stack.Screen name='individual-perf' component={Individual} />
+        <Stack.Screen name='team-perf' component={Team} />
+        <Stack.Screen name='individualTeam-perf' component={individualTeam} />
       </Stack.Navigator>
           
     </SafeAreaView>
