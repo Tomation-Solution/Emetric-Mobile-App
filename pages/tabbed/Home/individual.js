@@ -17,7 +17,7 @@ export default function Individual() {
     const [startBefore, setStartBefore] = useState(null)
     const [expanded, setExpanded] = React.useState(false);
     const handlePress = () => setExpanded(!expanded);
-
+    const today = new Date()
 
     const [stats, setStats] = useState({
         pending:0, active:0, over_due:0, closed:0, 
@@ -40,12 +40,12 @@ export default function Individual() {
     ]
     
     const filterData=[
-        {id:1, name:'Day'},
-        {id:2, name:'Week'},
-        {id:3, name:'Month'},
-        {id:4, name:'Quarter'},
-        {id:5, name:'Bi-Annual'},
-        {id:6, name:'Annual'},
+        {id:1, name:'Day',startBefore:moment(today).format('YYYY-MM-DD')},
+        {id:2, name:'Week',startBefore: moment(today.setDate(today.getDate()-7) ).format('YYYY-MM-DD')},
+        {id:3, name:'Month',startBefore: moment(today.setDate(today.getDate()-31) ).format('YYYY-MM-DD')},
+        {id:4, name:'Quarter',startBefore: moment(today.setDate(today.getDate()-92) ).format('YYYY-MM-DD')},
+        {id:5, name:'Bi-Annual', startBefore: moment(today.setDate(today.getDate()-180) ).format('YYYY-MM-DD')},
+        {id:6, name:'Annual',startBefore: moment(today.setDate(today.getDate()-365) ).format('YYYY-MM-DD')},
     ]
     const callback=(response)=>{
         console.log(response)
@@ -72,30 +72,31 @@ export default function Individual() {
 
     const handleChildPress = (income) => {
         setExpanded(!expanded)
-        setFilter(income.name)
+        setFilter(income)
+        // alert(income.startBefore)
     };
     // console.log(filter)
 
     let startDate;
     // let startBefore;
-    const today = new Date()
-    if(!filter || filter =='Day'){
+    
+    if(!filter || filter.name =='Day'){
         startDate=moment(today).format('YYYY-MM-DD')
         // setStartBefore(moment(today).format('YYYY-MM-DD'))
         // console.log(moment(startDate).format('YYYY-MM-DD'))
-    }else if(filter=='Week'){
+    }else if(filter.name=='Week'){
         startDate=moment(today.setDate(today.getDate()+7) ).format('YYYY-MM-DD')
         // setStartBefore(moment(today.setDate(today.getDate()-7) ).format('YYYY-MM-DD'))
-    }else if(filter=='Month'){
+    }else if(filter.name=='Month'){
         startDate=moment(today.setDate(today.getDate()+30) ).format('YYYY-MM-DD')
         // setStartBefore(moment(today.setDate(today.getDate()-30) ).format('YYYY-MM-DD'))
-    }else if(filter=='Quarter'){
+    }else if(filter.name=='Quarter'){
         startDate=moment(today.setDate(today.getDate()+90) ).format('YYYY-MM-DD');
         // setStartBefore(moment(today.setDate(today.getDate()-90) ).format('YYYY-MM-DD'))
-    }else if(filter=='Bi-Annual'){
+    }else if(filter.name=='Bi-Annual'){
         startDate=moment(today.setDate(today.getDate()+182) ).format('YYYY-MM-DD');
         // setStartBefore(moment(today.setDate(today.getDate()-182) ).format('YYYY-MM-DD'))
-    }else if(filter=='Annual'){
+    }else if(filter.name=='Annual'){
         startDate=moment(today.setDate(today.getDate()+365) ).format('YYYY-MM-DD');
         // setStartBefore(moment(today.setDate(today.getDate()-365) ).format('YYYY-MM-DD'))
     }
@@ -103,8 +104,8 @@ export default function Individual() {
     // console.log(moment(today.setDate(today.getDate()-7) ).format('YYYY-MM-DD'))
     useEffect(()=>{
         if(startDate){
-        UserDashboard(callback, startDate)
-        UserTasksByEmail(taskCallback,startDate)
+        UserDashboard(callback, filter.startBefore)
+        UserTasksByEmail(taskCallback,filter.startBefore)
         UserTasksByStatus('pending', pendingCallback)
         UserTasksByStatus('awaiting_rating', awaitingCallback, startDate)
         UserTasksByStatus('rework', reworkCallback, startDate)
@@ -131,7 +132,7 @@ export default function Individual() {
         ListHeaderComponent={
             <View style={tw`w-5/12`}>
                 <List.Accordion style={tw`w-full`} expanded={expanded}
-                    onPress={handlePress} titleNumberOfLines={1}  title={!filter ?'Filter':filter}>
+                    onPress={handlePress} titleNumberOfLines={1}  title={!filter ?'Filter':filter.name}>
                 {filterData.map((e)=>
                 <List.Item key={e.id} title={e.name} onPress={()=>handleChildPress(e)}/>)}
                 {/* <List.Item title='Week'/>
