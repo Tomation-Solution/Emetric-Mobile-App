@@ -1,6 +1,7 @@
 import React, {useState} from 'react';
 import { View, Image,SafeAreaView, ScrollView,Text, Switch,Pressable } from 'react-native';
 import { DrawerItem} from '@react-navigation/drawer';
+import localStorage from 'react-native-sync-localstorage'
 import { useNavigation } from '@react-navigation/native';
 import Ionicon from 'react-native-vector-icons/Ionicons';
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons'
@@ -80,7 +81,8 @@ export default function CustomDrawerList({navigation}) {
            
             <ScrollView >
 
-            <Image style={tw`mx-auto mt-6 mb-2`} source={require('../../../images/Logo/r8.png')} />
+            {/* <Image style={tw`mx-auto mt-6 mb-2`} source={require('../../../images/Logo/r8.png')} /> */}
+            <Image style={tw`mx-auto mt-6 mb-2 h-20 w-20`} source={{uri:localStorage.getItem('company_logo')}} />
             <Text style={tw`font-bold text-center mb-7`}>Demo</Text>
             { drawerData.map(e=>
             

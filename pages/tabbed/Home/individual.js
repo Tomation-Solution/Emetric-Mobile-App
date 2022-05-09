@@ -1,14 +1,17 @@
-import { ScrollView,View, FlatList, Text } from 'react-native'
+import { ScrollView,View, FlatList,BackHandler, Text } from 'react-native'
 import React, {useEffect, useState} from 'react'
 import tw from 'tailwind-react-native-classnames'
-import localStorage from 'react-native-sync-localstorage'
+import { useFocusEffect } from '@react-navigation/native';
 import moment from 'moment'
 
 import IconCard from '../../../components/card/iconCard'
-import { UserDashboard, UserTaskInfo, UserTasksByEmail, UserTasksByStatus} from '../../../actions/actions'
+import { GetCurrentOrg, UserDashboard, UserTaskInfo, UserTasksByEmail, UserTasksByStatus} from '../../../actions/actions'
 import { List } from 'react-native-paper'
+import ModalTemplate from '../../../components/modal';
+import Logout from '../../../components/modal/Logout';
 
 export default function Individual() {
+    const [modalVisible, setModalVisible] = useState(false)
     const [cumulative, setCumulative] = useState(null)
     const [pending, setPending] = useState(0)
     const [rework, setRework] = useState(0)
@@ -53,7 +56,7 @@ export default function Individual() {
     }
 
     const pendingCallback=(response)=>{setPending(response.data.count)}
-    const awaitingCallback=(response)=>{setAwaiting(response.data.count)}
+    const awaitingCallback=(response)=>{console.log(response.data.count);setAwaiting(response.data.count)}
     const reworkCallback=(response)=>{setRework(response.data.count)}
 
     const taskCallback=(response)=>{ 
@@ -103,11 +106,12 @@ export default function Individual() {
 
     // console.log(moment(today.setDate(today.getDate()-7) ).format('YYYY-MM-DD'))
     useEffect(()=>{
+        // GetCurrentOrg()
         if(startDate){
         UserDashboard(callback, filter?.startBefore)
         UserTasksByEmail(taskCallback,filter?.startBefore)
         UserTasksByStatus('pending', pendingCallback)
-        UserTasksByStatus('awaiting_rating', awaitingCallback, startDate)
+        UserTasksByStatus('awaiting_rating', awaitingCallback)
         UserTasksByStatus('rework', reworkCallback, startDate)
         }else{
         UserDashboard(callback)
@@ -117,13 +121,35 @@ export default function Individual() {
         UserTasksByStatus('rework', reworkCallback)
         }
         // UserTaskInfo(taskCallback)
-    },[filter])
+    },[filter,awaiting])
 
+    function useExitOnBack() {
+        useFocusEffect(
+          React.useCallback(() => {
+            const handleBackPress = () => {
+              setModalVisible(true)
+              // BackHandler.exitApp();
+              return true;
+            };
+            BackHandler.addEventListener('hardwareBackPress', handleBackPress);
+            return () =>
+              BackHandler.removeEventListener('hardwareBackPress', handleBackPress);
+          }, []),
+        );
+      }
+      
+       
+        useExitOnBack();
     // console.log(localStorage.getItem('uuid'))
     
 
   return (
-
+    <View>
+        <ModalTemplate
+            visible={modalVisible}
+            body={<Logout setVisible={setModalVisible}/>}
+        
+        />
     <FlatList
         data={data}
         keyExtractor={(item)=>item.id}
@@ -157,5 +183,6 @@ export default function Individual() {
             </View>
         }
     />
+    </View>
   )
 }

@@ -18,6 +18,7 @@ import { ReworkTask } from '../../../actions/actions';
 export default function Rework(props) {
 const [visible, setVisible] = useState(true)
 const [action, setAction] = useState(0)
+const [loading, setLoading] = useState(false)
 const navigation = useNavigation()
 const [document, setDocument] =useState(null)
 const [adopt, setAdopt] = useState(false)
@@ -86,8 +87,9 @@ const timeData = [
 console.log(props.id)
 
 const handleRework=()=>{
+  setLoading(true)
     ReworkTask(props.id,callback,{"rework_remark": remark,
-    "rework_end_date":moment(date).format('YYYY-MM-DD'),"rework_end_time":filterMember.label} )
+    "rework_end_date":moment(date).format('YYYY-MM-DD'),"rework_end_time":filterMember.label}, setLoading )
 }
 
 const callback =(res)=>{
@@ -157,7 +159,12 @@ const callback =(res)=>{
                     <Text style={tw`my-auto text-center`}>Close</Text>
                 </Pressable>
                 <View style={tw`w-5/12`}>
+                { loading ? 
+                <View style={tw`w-6/12 mx-auto`}>
+                    <Text style={tw`text-center bg-gray-200 py-3 rounded-lg`}>Upload</Text>
+                </View>:
                     <RoundedButton text='Submit' pressed={handleRework}/>
+                }
                 </View>
                 
             </View>

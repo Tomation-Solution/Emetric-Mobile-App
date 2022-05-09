@@ -61,6 +61,7 @@ const [tat, setTat] = useState(null)
 const [qtu, setQtu] = useState(null)
 // const [org, setOrg] = useState(null)
 const [occurs, setOccurs] = useState(0)
+// const [loading, setLoading] = useState(0)
 const [endPeriod, setEndPeriod] = useState(0)
 const [picked, setPicked] = useState([])
 const [showSuccess,setShowSuccess] = useState(false)
@@ -121,6 +122,11 @@ const handlePickDays =(day)=>{
 
 }
 console.log(picked)
+}
+
+const handleCreateTask=()=>{
+  setLoading(true)
+  CreateTask(formData, createTaskCallback, setLoading)
 }
 
 
@@ -499,9 +505,14 @@ let formData = new FormData();
             <Pressable  onPress={cancel}style={tw`w-3/12 my-auto`}>
               <Text style={tw`my-auto`}>Cancel</Text>
             </Pressable>
-            <View style={tw`w-9/12`}>
-              <RoundedButton text='Submit' pressed={()=> CreateTask(formData, createTaskCallback)
-}/>
+            <View style={tw`w-9/12 pt-1`}>
+             { loading ?
+             <View style={tw`py-2.5 rounded-lg w-full bg-blue-100`}>
+               <Text style={tw`text-center text-blue-700`}>Loading</Text>
+             </View>
+             : 
+              <RoundedButton text='Submit' pressed={()=> handleCreateTask()}/>
+             }
              {/* CreateTask(formData, createTaskCallback) */}
             </View>
           </View>
