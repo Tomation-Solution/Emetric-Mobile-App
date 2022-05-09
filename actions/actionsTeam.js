@@ -6,7 +6,7 @@ import api from '../api/api'
 export const TeamTasksByUid = async(callback, startTime)=>{
     // console.log(localStorage.getItem('user_id'))
     try {
-      const response =  startTime ? await api.get(`client/${localStorage.getItem('org_name')}/task/report/team/${localStorage.getItem('team_uuid')}/?start_date_before=${start_date_before}&start_date_after=${start_date_after}&dashboard_report=True`)
+      const response =  startTime ? await api.get(`client/${localStorage.getItem('org_name')}/task/report/team/${localStorage.getItem('team_uuid')}/?start_date_after=${startTime}&dashboard_report=True`)
         :await api.get(`client/${localStorage.getItem('org_name')}/task/report/team/${localStorage.getItem('team_uuid')}/?dashboard_report=True`);
        
             //    console.log(localStorage.getItem('uuid')) 
@@ -145,12 +145,12 @@ export const MemberDashboard = async(user_id,callback)=>{
 export const CorporateDashboard = async(status,callback,startDate)=>{
     // console.log(localStorage.getItem('user_id'))
     try {
-        const response = startDate ? await api.get(`client/${localStorage.getItem('org_name')}/objective/?objective_status=pending&start_date_after=2022-01-06&dashboard_report=True/`)
+        const response = startDate ? await api.get(`client/${localStorage.getItem('org_name')}/objective/?objective_status=${status}&start_date_after=${startDate}&dashboard_report=True`)
         : await api.get(`client/${localStorage.getItem('org_name')}/objective/?objective_status=${status}`);
     //    
         if (response.status==200) {
             // console.log(response.data.data[0])
-            callback(response.data.data);
+            callback(response);
             
         } else {
           console.log(response.data.status)

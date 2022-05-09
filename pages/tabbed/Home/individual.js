@@ -104,8 +104,8 @@ export default function Individual() {
     // console.log(moment(today.setDate(today.getDate()-7) ).format('YYYY-MM-DD'))
     useEffect(()=>{
         if(startDate){
-        UserDashboard(callback, filter.startBefore)
-        UserTasksByEmail(taskCallback,filter.startBefore)
+        UserDashboard(callback, filter?.startBefore)
+        UserTasksByEmail(taskCallback,filter?.startBefore)
         UserTasksByStatus('pending', pendingCallback)
         UserTasksByStatus('awaiting_rating', awaitingCallback, startDate)
         UserTasksByStatus('rework', reworkCallback, startDate)
