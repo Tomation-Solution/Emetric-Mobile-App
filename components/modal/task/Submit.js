@@ -14,7 +14,7 @@ import { SubmitTask } from '../../../actions/actions';
 
 export default function Submit(props) {
 const [visible, setVisible] = useState(true)
-const [action, setAction] = useState(0)
+const [loading, setLoading] = useState(false)
 const navigation = useNavigation()
 // const [document, setDocument] =useState(null)
 const [qauntityAcheived, setQuantityAccheived] =useState(null)
@@ -73,16 +73,17 @@ const callback =(res)=>{
 //   formData.append('task[task_id]', props.id)
 
     const Submit=()=>{
+        setLoading(true)
         let formData = new FormData();
-    if(qauntityAcheived){    
-    formData.append('quantity_target_unit_achieved',qauntityAcheived)}
+    // if(qauntityAcheived){    
+    // formData.append('quantity_target_unit_achieved',qauntityAcheived)}
     // formData.append('submission',document)
     if(uploadResult){
     formData.append('submission',{uri: document, name: document.split('/').pop(), type:uploadResult.mimeType });
   }
   formData.append('task[task_id]', props.id)
         
-        SubmitTask(formData,callback,config)
+        SubmitTask(formData,callback,config, setLoading)
 }
 
   return (
@@ -121,7 +122,12 @@ const callback =(res)=>{
                     <Text style={tw`my-auto text-center`}>Close</Text>
                 </Pressable>
                 <View style={tw`w-5/12`}>
+                { loading ? 
+                <View style={tw`w-6/12 mx-auto`}>
+                    <Text style={tw`text-center bg-gray-200 py-3 rounded-lg`}>Upload</Text>
+                </View>:
                     <RoundedButton text='Submit' pressed={()=>Submit()}/>
+                }
                 </View>
                 
             </View>

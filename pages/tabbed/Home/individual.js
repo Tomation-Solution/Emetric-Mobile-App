@@ -1,14 +1,17 @@
-import { ScrollView,View, FlatList, Text } from 'react-native'
+import { ScrollView,View, FlatList,BackHandler, Text } from 'react-native'
 import React, {useEffect, useState} from 'react'
 import tw from 'tailwind-react-native-classnames'
-import localStorage from 'react-native-sync-localstorage'
+import { useFocusEffect } from '@react-navigation/native';
 import moment from 'moment'
 
 import IconCard from '../../../components/card/iconCard'
-import { UserDashboard, UserTaskInfo, UserTasksByEmail, UserTasksByStatus} from '../../../actions/actions'
+import { GetCurrentOrg, UserDashboard, UserTaskInfo, UserTasksByEmail, UserTasksByStatus} from '../../../actions/actions'
 import { List } from 'react-native-paper'
+import ModalTemplate from '../../../components/modal';
+import Logout from '../../../components/modal/Logout';
 
 export default function Individual() {
+    const [modalVisible, setModalVisible] = useState(false)
     const [cumulative, setCumulative] = useState(null)
     const [pending, setPending] = useState(0)
     const [rework, setRework] = useState(0)
@@ -17,7 +20,7 @@ export default function Individual() {
     const [startBefore, setStartBefore] = useState(null)
     const [expanded, setExpanded] = React.useState(false);
     const handlePress = () => setExpanded(!expanded);
-
+    const today = new Date()
 
     const [stats, setStats] = useState({
         pending:0, active:0, over_due:0, closed:0, 
@@ -40,12 +43,12 @@ export default function Individual() {
     ]
     
     const filterData=[
-        {id:1, name:'Day'},
-        {id:2, name:'Week'},
-        {id:3, name:'Month'},
-        {id:4, name:'Quarter'},
-        {id:5, name:'Bi-Annual'},
-        {id:6, name:'Annual'},
+        {id:1, name:'Day',startBefore:moment(today).format('YYYY-MM-DD')},
+        {id:2, name:'Week',startBefore: moment(today.setDate(today.getDate()-7) ).format('YYYY-MM-DD')},
+        {id:3, name:'Month',startBefore: moment(today.setDate(today.getDate()-31) ).format('YYYY-MM-DD')},
+        {id:4, name:'Quarter',startBefore: moment(today.setDate(today.getDate()-92) ).format('YYYY-MM-DD')},
+        {id:5, name:'Bi-Annual', startBefore: moment(today.setDate(today.getDate()-180) ).format('YYYY-MM-DD')},
+        {id:6, name:'Annual',startBefore: moment(today.setDate(today.getDate()-365) ).format('YYYY-MM-DD')},
     ]
     const callback=(response)=>{
         console.log(response)
@@ -53,7 +56,7 @@ export default function Individual() {
     }
 
     const pendingCallback=(response)=>{setPending(response.data.count)}
-    const awaitingCallback=(response)=>{setAwaiting(response.data.count)}
+    const awaitingCallback=(response)=>{console.log(response.data.count);setAwaiting(response.data.count)}
     const reworkCallback=(response)=>{setRework(response.data.count)}
 
     const taskCallback=(response)=>{ 
@@ -72,41 +75,43 @@ export default function Individual() {
 
     const handleChildPress = (income) => {
         setExpanded(!expanded)
-        setFilter(income.name)
+        setFilter(income)
+        // alert(income.startBefore)
     };
     // console.log(filter)
 
     let startDate;
     // let startBefore;
-    const today = new Date()
-    if(!filter || filter =='Day'){
+    
+    if(!filter || filter.name =='Day'){
         startDate=moment(today).format('YYYY-MM-DD')
         // setStartBefore(moment(today).format('YYYY-MM-DD'))
         // console.log(moment(startDate).format('YYYY-MM-DD'))
-    }else if(filter=='Week'){
+    }else if(filter.name=='Week'){
         startDate=moment(today.setDate(today.getDate()+7) ).format('YYYY-MM-DD')
         // setStartBefore(moment(today.setDate(today.getDate()-7) ).format('YYYY-MM-DD'))
-    }else if(filter=='Month'){
+    }else if(filter.name=='Month'){
         startDate=moment(today.setDate(today.getDate()+30) ).format('YYYY-MM-DD')
         // setStartBefore(moment(today.setDate(today.getDate()-30) ).format('YYYY-MM-DD'))
-    }else if(filter=='Quarter'){
+    }else if(filter.name=='Quarter'){
         startDate=moment(today.setDate(today.getDate()+90) ).format('YYYY-MM-DD');
         // setStartBefore(moment(today.setDate(today.getDate()-90) ).format('YYYY-MM-DD'))
-    }else if(filter=='Bi-Annual'){
+    }else if(filter.name=='Bi-Annual'){
         startDate=moment(today.setDate(today.getDate()+182) ).format('YYYY-MM-DD');
         // setStartBefore(moment(today.setDate(today.getDate()-182) ).format('YYYY-MM-DD'))
-    }else if(filter=='Annual'){
+    }else if(filter.name=='Annual'){
         startDate=moment(today.setDate(today.getDate()+365) ).format('YYYY-MM-DD');
         // setStartBefore(moment(today.setDate(today.getDate()-365) ).format('YYYY-MM-DD'))
     }
 
     // console.log(moment(today.setDate(today.getDate()-7) ).format('YYYY-MM-DD'))
     useEffect(()=>{
+        // GetCurrentOrg()
         if(startDate){
-        UserDashboard(callback, startDate)
-        UserTasksByEmail(taskCallback,startDate)
+        UserDashboard(callback, filter?.startBefore)
+        UserTasksByEmail(taskCallback,filter?.startBefore)
         UserTasksByStatus('pending', pendingCallback)
-        UserTasksByStatus('awaiting_rating', awaitingCallback, startDate)
+        UserTasksByStatus('awaiting_rating', awaitingCallback)
         UserTasksByStatus('rework', reworkCallback, startDate)
         }else{
         UserDashboard(callback)
@@ -116,13 +121,35 @@ export default function Individual() {
         UserTasksByStatus('rework', reworkCallback)
         }
         // UserTaskInfo(taskCallback)
-    },[filter])
+    },[filter,awaiting])
 
+    function useExitOnBack() {
+        useFocusEffect(
+          React.useCallback(() => {
+            const handleBackPress = () => {
+              setModalVisible(true)
+              // BackHandler.exitApp();
+              return true;
+            };
+            BackHandler.addEventListener('hardwareBackPress', handleBackPress);
+            return () =>
+              BackHandler.removeEventListener('hardwareBackPress', handleBackPress);
+          }, []),
+        );
+      }
+      
+       
+        useExitOnBack();
     // console.log(localStorage.getItem('uuid'))
     
 
   return (
-
+    <View>
+        <ModalTemplate
+            visible={modalVisible}
+            body={<Logout setVisible={setModalVisible}/>}
+        
+        />
     <FlatList
         data={data}
         keyExtractor={(item)=>item.id}
@@ -131,7 +158,7 @@ export default function Individual() {
         ListHeaderComponent={
             <View style={tw`w-5/12`}>
                 <List.Accordion style={tw`w-full`} expanded={expanded}
-                    onPress={handlePress} titleNumberOfLines={1}  title={!filter ?'Filter':filter}>
+                    onPress={handlePress} titleNumberOfLines={1}  title={!filter ?'Filter':filter.name}>
                 {filterData.map((e)=>
                 <List.Item key={e.id} title={e.name} onPress={()=>handleChildPress(e)}/>)}
                 {/* <List.Item title='Week'/>
@@ -156,5 +183,6 @@ export default function Individual() {
             </View>
         }
     />
+    </View>
   )
 }

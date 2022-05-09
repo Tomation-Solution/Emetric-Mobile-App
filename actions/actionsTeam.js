@@ -6,7 +6,7 @@ import api from '../api/api'
 export const TeamTasksByUid = async(callback, startTime)=>{
     // console.log(localStorage.getItem('user_id'))
     try {
-      const response =  startTime ? await api.get(`client/${localStorage.getItem('org_name')}/task/report/team/${localStorage.getItem('team_uuid')}/?start_date_before=${start_date_before}&start_date_after=${start_date_after}&dashboard_report=True`)
+      const response =  startTime ? await api.get(`client/${localStorage.getItem('org_name')}/task/report/team/${localStorage.getItem('team_uuid')}/?start_date_after=${startTime}&dashboard_report=True`)
         :await api.get(`client/${localStorage.getItem('org_name')}/task/report/team/${localStorage.getItem('team_uuid')}/?dashboard_report=True`);
        
             //    console.log(localStorage.getItem('uuid')) 
@@ -145,12 +145,12 @@ export const MemberDashboard = async(user_id,callback)=>{
 export const CorporateDashboard = async(status,callback,startDate)=>{
     // console.log(localStorage.getItem('user_id'))
     try {
-        const response = startDate ? await api.get(`client/${localStorage.getItem('org_name')}/objective/?objective_status=pending&start_date_after=2022-01-06&dashboard_report=True/`)
+        const response = startDate ? await api.get(`client/${localStorage.getItem('org_name')}/objective/?objective_status=${status}&start_date_after=${startDate}&dashboard_report=True`)
         : await api.get(`client/${localStorage.getItem('org_name')}/objective/?objective_status=${status}`);
     //    
         if (response.status==200) {
             // console.log(response.data.data[0])
-            callback(response.data.data);
+            callback(response);
             
         } else {
           console.log(response.data.status)
@@ -216,25 +216,26 @@ export const RateTask = async(taskId,callback,formdata,config)=>{
 
 // ,{width:props.width ? '45%':'93%'}
 // /client/{{ORGANISATION_NAME}}/task/bulk-add/
-export const UploadBulkTask = async(callback,formdata)=>{
+export const UploadBulkTask = async(callback,formdata, setLoading)=>{
     // console.log(localStorage.getItem('user_id'))
     console.log(formdata)
     try {
         const response = await api.post(`client/${localStorage.getItem('org_name')}/task/bulk-add/`, formdata);  
         if (response.status==200 ||response.status==201 ) {
             console.log(response)
+            setLoading(false)
             callback(response.data.data);
             
         } else {
           console.log(response.data.status)
+          setLoading(false)
           callback(response.data)
         // setLoading(false)
         }
     } catch (error) {
-        console.error(error)
-        alert(error.response.data.errors[0].message)
-
-        // setLoading(false)
+        setLoading(false)
+        console.error(error.response.data.errors[0].message.map(e=>e.message))
+        alert(error.response.data.errors[0].message.map(e=>'Line ' +e.line+' '+e.message))
 
     }
 }

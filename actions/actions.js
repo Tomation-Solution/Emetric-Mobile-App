@@ -1,5 +1,6 @@
 
 // import api from '../helpers/api'
+import { set } from 'react-native-reanimated';
 import localStorage from 'react-native-sync-localstorage'
 import api from '../api/api'
 
@@ -14,7 +15,14 @@ export const LoginUser = async(data, org, callback, setLoading)=>{
             localStorage.setItem('org_name',org)
             
             const user= await api.get(`client/${org}/employee/?user__email=${data.email}`)
+            // const org= await api.get(`client/${org}/employee/?user__email=${data.email}`)
             if(user.status==200){
+                const org= await api.get(`client/${localStorage.getItem('org_name')}/organisation/current/`)
+                if(org.status=200){
+                    // console.log(org.data.company_logo)
+                localStorage.setItem('company_logo',org.data.company_logo)
+
+                }
                 console.log(user.data.data)
                 console.log(user.data.data.map(e=>e.corporate_level.uuid))
 
@@ -193,7 +201,7 @@ export const UserDashboard = async(callback, startDate)=>{
 }
 
 // client/{{ORGANISATION_NAME}}/task/
-export const CreateTask = async(data, callback)=>{
+export const CreateTask = async(data, callback, setLoading)=>{
     console.log(data)
     try {
         const response = await api.post(`client/${localStorage.getItem('org_name')}/task/`,data);
@@ -202,16 +210,20 @@ export const CreateTask = async(data, callback)=>{
             alert('yeah')
                 console.log(response)
                 callback(response)
-            
+            setLoading(false)
         
         } else {
           console.log(response.data)
           alert(response.message)
+          setLoading(false)
+
         //   callback(response.data)
         // setLoading(false)
         }
     } catch (error) {
         console.error(error)
+        setLoading(false)
+
         // if(error.code)
         alert(error.response.data.errors[0].message +' '+error.response.data.errors[0].field)
         
@@ -281,7 +293,7 @@ export const getTaskBid = async(taskId, callback)=>{
 }
 
 
-export const SubmitTask = async(data, callback, config)=>{
+export const SubmitTask = async(data, callback, config, setLoading)=>{
     console.log(data)
     // console.log(taskId)
     try {
@@ -291,16 +303,19 @@ export const SubmitTask = async(data, callback, config)=>{
             alert('yeah')
                 // console.log(response)
                 callback(response)
+                setLoading(false)
             
         
         } else {
         //   console.log(response.data)
           alert(response.status)
+          setLoading(false)
         //   callback(response.data)
         // setLoading(false)
         }
     } catch (error) {
         console.error(error)
+        setLoading(false)
         // if(error.code)
         if(error.message.includes('401'||'404')){
             alert('Invalid Login Details')
@@ -315,7 +330,7 @@ export const SubmitTask = async(data, callback, config)=>{
 }
 
 // /task/:task_id/rework/
-export const ReworkTask = async(task_id, callback, data, )=>{
+export const ReworkTask = async(task_id, callback, data, setLoading )=>{
     console.log(data)
     // console.log(taskId)
     try {
@@ -324,11 +339,16 @@ export const ReworkTask = async(task_id, callback, data, )=>{
         if (response.status ==201 || response.status ==200) {
             alert('yeah')
             callback(response)
+            setLoading(false)
         } else {
+            setLoading(false)
+
           alert(response.status)
         }
     } catch (error) {
         console.error(error)
+        setLoading(false)
+
         // if(error.code)
         if(error.message.includes('401'||'404')){
             alert('Invalid Login Details')

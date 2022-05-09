@@ -11,6 +11,7 @@ import { UploadBulkTask } from '../../actions/actionsTeam';
 
 export default function UploadTask(props) {
     const navigation = useNavigation()
+    const [loading, setLoading] = useState(false)
     const [document, setDocument] =useState(null)
     const _pickDocument = async () => {
 	    let result = await DocumentPicker.getDocumentAsync({});
@@ -28,10 +29,11 @@ export default function UploadTask(props) {
         props.setVisible(false)
     }
     const onSubmit =()=>{
+        setLoading(true)
         let formData = new FormData();
-        formData.append('template_file',{ uri: document.uri, name: document.uri.split('/').pop(), type:document.mimeType.split('/')[1] });
+        formData.append('template_file',{ uri: document.uri, name: document.uri.split('/').pop(), type:document.mimeType });
 
-        UploadBulkTask(callback, formData)
+        UploadBulkTask(callback, formData, setLoading)
     }
 
   return (
@@ -42,7 +44,7 @@ export default function UploadTask(props) {
         <Pressable onPress={()=>_pickDocument()} style={[tw`${document ? 'pb-1 pt-3' :'py-5'} px-2 my-4 mx-auto  w-11/12 `,{borderWidth:1,borderColor:'#365C2A', borderStyle: 'dashed',
             borderRadius: 1, borderStyle:'dashed',}]}>
             
-            <Ionicon name="ios-cloud-upload" style={tw`m-auto`} color={document ? 'purple': 'rgba(0,0,0,0.4)'} size={50}/>
+            <Ionicon name="ios-cloud-upload" style={tw`m-auto`} color={document?.uri ? 'purple': 'rgba(0,0,0,0.4)'} size={50}/>
 
             <Text style={tw`text-center text-gray-400`} numberOfLines={1}>
                 { document ? document.name:
@@ -51,10 +53,11 @@ export default function UploadTask(props) {
             </Text>
             
         </Pressable>
-        { document ?
+        { document?.uri && !loading ?
             <View style={tw`w-6/12 mx-auto`}>
                 <RoundedButton pressed={()=>onSubmit()} text='Upload'/>
-            </View>: <View style={tw`w-6/12 mx-auto`}>
+            </View>: 
+            <View style={tw`w-6/12 mx-auto`}>
                 <Text style={tw`text-center bg-gray-200 py-3 rounded-lg`}>Upload</Text>
             </View>
         }
