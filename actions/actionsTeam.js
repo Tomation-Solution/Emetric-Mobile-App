@@ -216,25 +216,26 @@ export const RateTask = async(taskId,callback,formdata,config)=>{
 
 // ,{width:props.width ? '45%':'93%'}
 // /client/{{ORGANISATION_NAME}}/task/bulk-add/
-export const UploadBulkTask = async(callback,formdata)=>{
+export const UploadBulkTask = async(callback,formdata, setLoading)=>{
     // console.log(localStorage.getItem('user_id'))
     console.log(formdata)
     try {
         const response = await api.post(`client/${localStorage.getItem('org_name')}/task/bulk-add/`, formdata);  
         if (response.status==200 ||response.status==201 ) {
             console.log(response)
+            setLoading(false)
             callback(response.data.data);
             
         } else {
           console.log(response.data.status)
+          setLoading(false)
           callback(response.data)
         // setLoading(false)
         }
     } catch (error) {
-        console.error(error)
-        alert(error.response.data.errors[0].message)
-
-        // setLoading(false)
+        setLoading(false)
+        console.error(error.response.data.errors[0].message.map(e=>e.message))
+        alert(error.response.data.errors[0].message.map(e=>'Line ' +e.line+' '+e.message))
 
     }
 }
