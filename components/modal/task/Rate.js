@@ -25,11 +25,13 @@ const [success, setSuccess] = useState(false)
 const [rateScore, setRateScore] =useState(null)
 const [qtyRateScore, setQtyRateScore] =useState(null) 
 const [remark, setRemark] =useState(null)
+const [uploadResult, setUploadResult]= useState(null)
    
 const _pickDocument = async () => {
 	    let result = await DocumentPicker.getDocumentAsync({});
         if(!result.cancelled){
             setDocument(result.uri)
+            setUploadResult(result)
         }
 	}
 const handleAction=(id)=>{
@@ -64,9 +66,9 @@ let formData = new FormData();
     if(props.details.task_type == 'qualitative' || props.details.task_type == 'qualitative & quantitative'){
     formData.append('quality_target_point_achieved',rateScore)}
     formData.append('rating_remark',remark)   //append the values with key, value pair
-    if(!adopt && document){
+    if(!adopt && uploadResult){
     // formData.append('submission',document)
-    formData.append('submission',{ uri: document, name: document.split('/').pop(), type:'pdf' });
+    formData.append('submission',{ uri: document, name: document.split('/').pop(), type: uploadResult.mimeType });
 }
     formData.append('use_owner_submission', adopt)
 // }
@@ -83,15 +85,15 @@ let formData = new FormData();
 // console.log(props.details.task_type)
 
 const callback=(res)=>{
-    console.log(res.status==200)
+    // console.log(res.status==200)
     setShowToast(true)
     // setMessage()
-    if(res.status==200){
+    // if(res.status==200){
         setMessage('Task has been rated')
         setSuccess(true)
         props.setVisible(false)
-        props.setReload(true)
-    }
+        props.setReload(!props.reload)
+    // }
 }
 
 const handleRate=()=>{
@@ -134,8 +136,8 @@ const handleRate=()=>{
                 <Text style={tw`px-2 text-gray-700 font-bold pb-1.5 my-auto`}>Upload Correct File</Text>
                 {/* <TextInput  /> */}
                 <Pressable onPress={()=>_pickDocument()} style={tw`bg-blue-50 rounded-xl flex-row w-full h-9`}>
-                    <Pressable style={tw`w-4/12 p-1 my-auto mx-1 rounded-md bg-gray-400`} >
-                        <Text>Choose File</Text>
+                    <Pressable style={tw`w-4/12 h-full p-1 my-auto mx-1 rounded-md bg-gray-400`} >
+                        <Text style={tw`text-xs my-auto`}>Choose File</Text>
                     </Pressable>
                     <Text style={tw`my-auto text-gray-500`}>{document ? document: 'No file Chosen'}</Text>
                 </Pressable>

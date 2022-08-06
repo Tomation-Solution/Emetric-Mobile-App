@@ -39,7 +39,7 @@ export default function Individual() {
         setAllData(res.data.data)
     }
 
-    console.log(localStorage.getItem('uuid'))
+    console.log(dashboardData)
     // const [uploadTask, setUploadTask] = useState(false)
     const data = [
         {id:1, name:'My Overall Performance', value:dashboardData.mop, percent:true},
@@ -60,8 +60,8 @@ export default function Individual() {
                     <IconCard
                         width={true}
                         key={e.id}
-                        amount={e.value}
-                        percent={e.percent}
+                        amount={e.value && e.value.length>0 ? e.amount : 0}
+                        percent={e.percent ? e.percent :0}
                         description={e.name}
                         bg='bg-blue-100'
                     />)

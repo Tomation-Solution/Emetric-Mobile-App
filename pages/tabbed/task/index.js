@@ -54,7 +54,7 @@ export default function Task({navigation}) {
         body={
             <View style={tw`flex-row justify-between px-2 py-3 bg-gray-100`}>
                 <Ionicon name='md-chevron-back' onPress={()=>navigation.navigate('Home')} size={23} />
-                <Text style={tw`font-bold`}>Debo's Task Deck</Text>
+                <Text style={tw`font-bold`}>My Task Deck</Text>
                 <Ionicon name='md-notifications' size={20} />
 
             </View>

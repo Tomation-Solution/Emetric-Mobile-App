@@ -1,5 +1,5 @@
-import { View, SafeAreaView, ScrollView, StatusBar, Platform,Text } from 'react-native'
-import React, {useState} from 'react'
+import { View, SafeAreaView, ScrollView, BackHandler, Alert, StatusBar, Platform,Text } from 'react-native'
+import React, {useState, useEffect} from 'react'
 import tw from 'tailwind-react-native-classnames'
 import Ionicon from 'react-native-vector-icons/Ionicons'
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons'
@@ -25,6 +25,28 @@ export default function Home({navigation}) {
     setSelected(index)
     navigation.navigate(to)
   }
+
+    useEffect(() => {
+      const backAction = () => {
+        Alert.alert("Hold on!", "Are you sure you want to go Exit this app?", [
+          {
+            text: "Cancel",
+            onPress: () => null,
+            style: "cancel"
+          },
+          { text: "YES", onPress: () => BackHandler.exitApp() }
+        ]);
+        return true;
+      };
+  
+      const backHandler = BackHandler.addEventListener(
+        "hardwareBackPress",
+        backAction
+      );
+  
+      return () => backHandler.remove();
+    }, []);
+  
 // console.log(localStorage.getItem('userInfo').role[0])
   return (
     <SafeAreaView style={tw`h-full`}>

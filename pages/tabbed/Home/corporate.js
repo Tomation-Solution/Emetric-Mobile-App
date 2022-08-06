@@ -96,6 +96,8 @@ export default function Corporate() {
         
     }
 
+    console.log(dashValue)
+
     
   const data = [
     {id:1, name:'Corporate Pending Objectives', value:pending},
@@ -126,10 +128,10 @@ return (
         ({item})=>
         <View style={tw`justify-around w-1/2`}>
             <IconCard
-                amount={item.value}
+                amount={item.value && item.value.length>0 ? item.value:0}
                 description={item.name}
                 bg='bg-blue-100'
-                percent={item.percent}
+                percent={item.percent ? item.percent : 0}
             />
         </View>
     }

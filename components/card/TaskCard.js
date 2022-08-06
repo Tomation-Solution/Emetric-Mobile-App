@@ -13,7 +13,9 @@ export const TaskCard =(props)=>{
             <Text style={tw`pb-2 border-b text-xs mb-1 border-gray-200`}>{props.name}</Text>
             <View style={tw`flex-row justify-between`}>
                 <Text style={tw`my-auto text-xs`}>{props.time}</Text>
-                <Text style={tw`my-auto px-2 text-xs rounded-lg ${props.status=='pending' ? 'bg-yellow-300': (props.status == 'awaiting rating' ?'bg-blue-300':'bg-red-300')} `}>{props.status}</Text>
+                <Text style={tw`my-auto px-2 text-xs rounded-lg ${props.status=='pending' ? 'bg-yellow-300': (props.status == 'awaiting rating' ?'bg-blue-300':'bg-red-300')} `}>
+                    {props.status == 'over_due' ? 'Overdue': props.status}
+                </Text>
                 <View>
                     {props.button1}
                     {/* <RoundedButton text='View' pressed={()=>props.navigation.navigate('view-member')}/> */}
@@ -34,7 +36,7 @@ export const TaskCard =(props)=>{
                 </View>}
                 { props.details.task_status == 'pending' ? <></>:
                 <View style={tw`w-full`}>
-                    <SmallButton pressed={()=>props.navigation.navigate('submitTask')} text='List Submitted Tasks'/>
+                    <SmallButton pressed={()=>props.navigation.navigate('submitTask', {task_id:props.selected, refresh:props.refresh, setRefresh:props.setRefresh,details:props.details})} text='List Submitted Tasks'/>
                 </View>}
                 { props.isMe ?<></>:
                 <View style={tw`w-full`}>

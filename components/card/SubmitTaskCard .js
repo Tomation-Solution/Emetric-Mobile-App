@@ -29,7 +29,7 @@ export const SubmitTaskCard =(props)=>{
                     <SmallButton pressed={()=>props.setView(true)} text='View'/>
                 </View>
 
-                <View style={tw`w-full`}>
+                {/* <View style={tw`w-full`}>
                     <SmallButton pressed={()=>props.navigation.navigate('submitTask')} text='Submit'/>
                 </View>
 
@@ -42,7 +42,7 @@ export const SubmitTaskCard =(props)=>{
                 </View>
                 <View style={tw`w-full`}>
                     <SmallButton pressed={()=>props.setRework(true)} text='Rework'/>
-                </View>
+                </View> */}
                 </View>
             </View>:<></>}
         </Pressable>

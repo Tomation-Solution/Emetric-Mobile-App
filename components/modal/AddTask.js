@@ -1,6 +1,7 @@
 import React, {useState, useEffect} from 'react'
-import {Text, View, ScrollView, Pressable, ActivityIndicator, SafeAreaView} from 'react-native'
+import {Text, View, ScrollView, Image, Pressable, ActivityIndicator, SafeAreaView} from 'react-native'
 import tw from 'tailwind-react-native-classnames';
+import localStorage from 'react-native-sync-localstorage'
 import DateTimePicker from '@react-native-community/datetimepicker' 
 import Ionicon from 'react-native-vector-icons/Ionicons'
 import {Checkbox, List, RadioButton} from 'react-native-paper'
@@ -42,7 +43,7 @@ const [expandTaskType, setExpandTaskType] = React.useState(false);
 const [startDate, setStartDate] = useState(new Date())
 const [endDate, setEndDate] = useState(new Date())
 const [startTime, setStartTime] = useState(new Date())
-const handleMemberPress = () => setExpandedMember(!expandedMember);
+const handleMemberPress = () => {setExpandedMember(!expandedMember); setFilterMember(null)};
 const handleTaskType = () => setExpandTaskType(!expandTaskType);
 const [filterMember, setFilterMember] = useState(null)
 const [filterDays, setFilterDays] = useState(null)
@@ -65,6 +66,7 @@ const [occurs, setOccurs] = useState(0)
 const [endPeriod, setEndPeriod] = useState(0)
 const [picked, setPicked] = useState([])
 const [showSuccess,setShowSuccess] = useState(false)
+const [loadingInitiative, setLoadingInitiatives] =useState(false)
 const [value, setValue] = useState({
   hours: 1,
   minutes: 0,
@@ -90,8 +92,11 @@ setFilterWeek(week)}
 
 const handleChildPressMember = (member) => {
   setExpandedMember(!expandedMember);
-setFilterMember(member)}
+  setFilterMember(member);
+  // getTeamInitiatives(oneInitiativeCallback, filterMember.email);
 
+}
+// console.log(filterMember.email)
 const handleRoutinePressMember = (routine) => {
   setExpandRoutine(!expandRoutine);
 setFilterRoutineOptions(routine)}
@@ -121,7 +126,7 @@ const handlePickDays =(day)=>{
   setPicked([...picked, day])
 
 }
-console.log(picked)
+// console.log(picked)
 }
 
 const handleCreateTask=()=>{
@@ -144,6 +149,13 @@ const handleCreateTask=()=>{
       GetCurrentOrg(orgCallback)
    }, [])
 
+   useEffect(() => {
+    if(filterMember){
+      setLoadingInitiatives(true)
+      getTeamInitiatives(oneInitiativeCallback, filterMember.email)}
+ }, [filterMember])
+
+
    const dashboardCallback = (res)=>{
       setTeamMembers(res.data.data.map(e=>e.user))
 }
@@ -153,6 +165,7 @@ const createTaskCallback=(res)=>{
   setShowSuccess(true)
   cancel()
   props.setVisible(false)
+  props.setReload(true)
 
   // props.setIsAdded(true)
   
@@ -163,8 +176,15 @@ const orgCallback=(res)=>{
   setOrg(res)
 }
 
+const oneInitiativeCallback=(res)=>{
+  setLoadingInitiatives(false)
+  setMemberInitiatives(res)
+  console.log(res)
+}
+
 const initiativeCallback=(res)=>{
   setInitiatives(res)
+  // console.log(res)
 }
 
 const showDays=(num)=>{
@@ -287,6 +307,9 @@ let formData = new FormData();
 
     }
 
+    const [MemberInitiatives, setMemberInitiatives] = useState(null)
+    console.log(MemberInitiatives)
+    
   
 
   return (
@@ -306,23 +329,35 @@ let formData = new FormData();
         <Text style={tw`text-center font-bold text-base my-2`}  >Set up Task</Text>
         <ScrollView showsVerticalScrollIndicator={false} style={tw`px-3`}>
           {/* <CustomPicker label='Choose Owner'/> */}
+          <Image style={tw`mx-auto mt-6 mb-2 h-20 w-20`} source={{uri:localStorage.getItem('company_logo')}} />
+
           <View style={tw`w-full pt-3`}>
             <Text>Choose Owner</Text>
             <List.Accordion style={tw`w-full text-xs`} expanded={expandedMember}
-            onPress={handleMemberPress} titleStyle={tw`text-blue-800`} titleNumberOfLines={1}  title={!filterMember ?'Select Member':filterMember.first_name+' '+ filterMember.last_name}>
+            onPress={handleMemberPress} titleStyle={tw`text-blue-800 text-sm`} titleNumberOfLines={1}  title={!filterMember ?'Select Member':filterMember.first_name+' '+ filterMember.last_name}>
                 {teamMembers? teamMembers?.map((e)=>
-                <List.Item style={tw` text-xs`} key={e.id} title={e.first_name + ' '+ e.last_name} onPress={()=>handleChildPressMember(e)}/>):<></>}
+                <List.Item style={tw`text-xs`} key={e.id} title={e.first_name + ' '+ e.last_name} onPress={()=>handleChildPressMember(e)}/>):<></>}
                 </List.Accordion>
           </View>
           {/* <View style={tw`pt-2 pb-1`}>
             <CustomPicker label='Upline Initiatives'/>
           </View> */}
-          <View style={tw`w-full pt-3`}>
-            <Text>Upline Initiative</Text>
-            <List.Accordion style={tw`w-full text-xs`} expanded={expandInitiative}
-            onPress={handleSelectInitiative} titleStyle={tw`text-blue-800`} titleNumberOfLines={1}  title={!selectedInitiative ?'Select Initiative':selectedInitiative.name}>
-                {initiatives? initiatives?.map((e)=>
-                <List.Item style={tw` text-xs`} key={e.initiative_id} title={e.name} onPress={()=>handleSelectInitiative(e)}/>):''}
+          <View style={tw`w-full pt-3 pb-2`}>
+            <Text>KPI</Text>
+            <List.Accordion style={tw`w-full rounded-xl text-xs h-12`} expanded={expandInitiative}
+            onPress={handleSelectInitiative} titleStyle={tw`text-blue-800 text-sm `} titleNumberOfLines={1}  title={!selectedInitiative ?'Select Initiative':selectedInitiative.name}>
+                {/* <List.Item style={tw`bg-gray-100`} titleStyle={tw` text-xs`} title='No Data'/> */}
+                <ScrollView style={tw`${MemberInitiatives && MemberInitiatives.length>0 && !loadingInitiative ? 'h-40': 'h-10 bg-blue-50'}`}>
+                {filterMember? (MemberInitiatives && MemberInitiatives.length>0 && !loadingInitiative ? MemberInitiatives.map((e)=>{ 
+                return <View>
+                        <List.Item style={tw` text-xs`} key={e.initiative_id} title={e.name} onPress={()=>handleSelectInitiative(e)}/>
+                      </View>
+              } ): (loadingInitiative ? 
+              <ActivityIndicator color='blue' />
+              :
+              <Text style={tw`mx-auto my-3`}>No Active Initiative</Text>)
+                )
+                :<Text style={tw`mx-auto my-3`}>No Owner Selected</Text>}</ScrollView>
                 </List.Accordion>
           </View>
           <Input label='Task Name' setValue={setTaskName} />
@@ -396,7 +431,7 @@ let formData = new FormData();
               <View style={tw`w-5/12 pt-3`}>
                 <Text style={tw`text-xs`}>Routine Options</Text>
                 <List.Accordion style={tw`w-full h-10 rounded-lg text-xs`} expanded={expandRoutine} 
-                onPress={()=>setExpandRoutine(!expandRoutine)} titleStyle={tw`text-blue-800 mt-1  h-6 text-sm p-0`} titleNumberOfLines={1}  title={!filterRoutineOptions?'Select Routine':filterRoutineOptions.name}>
+                onPress={()=>setExpandRoutine(!expandRoutine)} titleStyle={tw`text-blue-800 mt-1 -ml-2  h-6 text-xs p-0`} titleNumberOfLines={1}  title={!filterRoutineOptions?'Routine':filterRoutineOptions.name}>
                     {routineOptions? routineOptions?.map((e)=>
                     <List.Item titleStyle={tw`text-sm -my-2`} style={tw` w-full`} key={e.id} title={e.name} onPress={()=>handleRoutinePressMember(e)}/>):<></>}
                     </List.Accordion>
@@ -404,7 +439,7 @@ let formData = new FormData();
               <View style={tw`w-5/12 pt-3`}>
                 <Text style={tw`text-xs`}>Repeat Every (Days)</Text>
                 <List.Accordion style={tw`w-full h-10 rounded-lg text-xs`} expanded={expandRepeatDays} 
-                onPress={()=>setExpandRepeatDays(!expandRepeatDays)} titleStyle={tw`text-blue-800 mt-1  h-6 text-sm p-0`} titleNumberOfLines={1}  title={!filterRepeatDays?'Pick Day':filterRepeatDays}>
+                onPress={()=>setExpandRepeatDays(!expandRepeatDays)} titleStyle={tw`text-blue-800 mt-1  h-6 -ml-2 text-xs p-0`} titleNumberOfLines={1}  title={!filterRepeatDays?'Pick Day':filterRepeatDays}>
                    <ScrollView style={tw`h-20`}>  
                      {repeatList? repeatList?.map((e)=>    
                       <List.Item titleStyle={tw`text-sm -my-2`} style={tw` w-full`} key={e} title={e} onPress={()=>handleRepeatPress(e)}/>):<></>}
@@ -487,7 +522,7 @@ let formData = new FormData();
               <View style={tw`w-5/12 pt-3 ${endPeriod==0?'opacity-50':''}`}>
                 <Text style={tw`text-xs`}>After Occurrencies</Text>
                 <List.Accordion style={tw`w-full h-10 rounded-lg text-xs`} expanded={endPeriod==1 ?expandOccurence:''} 
-                onPress={()=>setExpandOccurrence(!expandOccurence)} titleStyle={tw`text-blue-800 mt-1  h-6 text-sm p-0`} titleNumberOfLines={1}  title={!filterOccurrence?'Select Option':filterOccurrence}>
+                onPress={()=>setExpandOccurrence(!expandOccurence)} titleStyle={tw`text-blue-800 mt-1  h-6 text-xs -ml-2 p-0`} titleNumberOfLines={1}  title={!filterOccurrence?'Option':filterOccurrence}>
                    <ScrollView style={tw`h-20`}>  
                     {occurrenceList? occurrenceList?.map((e)=>
                     <List.Item titleStyle={tw`text-sm -my-2`} style={tw` w-full`} key={e} title={e} onPress={()=>handleOccurence(e)}/>):<></>}

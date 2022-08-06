@@ -46,6 +46,11 @@ export default function Individual({navigation}) {
     const [pending, setPending] = useState(0)
     const [status, setStatus] = useState('pending')
     const [statusName, setStatusName] = useState('pending')
+    const [refresh, setRefresh] = useState(null)
+    const [reload, setReload] = useState(null)
+    const [showToast, setShowToast] = useState(null)
+    const [isFetching, setIsFetching] = useState(false)
+
     
     const [stats, setStats] = useState({
         pending:0, active:0, over_due:0, closed:0, 
@@ -89,6 +94,25 @@ export default function Individual({navigation}) {
         setFilter(income.name)
     };
 
+    const onRefresh = async () => {
+        MemberTasks(dashboardCallback)
+        if(startDate){
+            UserTasksByStatus('over_due', overdueCallback, startDate, moment(today).format('YYYY-MM-DD'))
+            UserTasksByStatus('pending', pendingCallback, startDate, moment(today).format('YYYY-MM-DD'))
+            // UserDashboard(callback)
+            UserTasksByStatus(status,callback, startDate, moment(today).format('YYYY-MM-DD'))
+            UserTasksByEmail(taskCallback, startDate, moment(today).format('YYYY-MM-DD'))
+        }else{
+        UserTasksByStatus('over_due', overdueCallback)
+        UserTasksByStatus('pending', pendingCallback)
+        // UserDashboard(callback)
+        UserTasksByStatus(status,callback)
+        UserTasksByEmail(taskCallback)
+        
+        UserTasksByStatus('active', activeCallback)}
+
+      };
+
     const callback=(response)=>{
         setTaskInfo(response.data.data)
         // console.log(response.data.data.map(e=>e.task_status=='pending').length)
@@ -97,7 +121,7 @@ export default function Individual({navigation}) {
     }
 
     const taskCallback=(response)=>{
-        console.log(response.data.data.map(e=>e.task_status=='pending'))
+        // console.log(response.data.data)
         setStats({
          pending: response.data.data.filter(e=>e.task_status=='pending').length,
          active: response.data.data.filter(e=>e.task_status=='active').length,
@@ -163,22 +187,23 @@ const overdueCallback=(res)=>{
         
         UserTasksByStatus('active', activeCallback)}
 
-    },[selectedTab, filter])
+    },[selectedTab, filter, refresh])
 
     const HeadComponent =()=>{
         return(
         <View>
             <View style={tw`w-5/12`}>
-                    <List.Accordion style={tw`w-full`} expanded={expanded}
-        onPress={handlePress} titleNumberOfLines={1}  title={!filter ?'Filter':filter}>
-                    {filterData.map((e)=>
-                    <List.Item key={e.id} title={e.name} onPress={()=>handleChildPress(e)}/>)}
-                    {/* <List.Item title='Week'/>
-                    <List.Item title='Month'/>
-                    <List.Item title='Quarter'/>
-                    <List.Item title='Bi-Annual'/>
-                    <List.Item title='Annual'/> */}
-                    </List.Accordion></View>
+                <List.Accordion style={tw`w-full`} expanded={expanded}
+                    onPress={handlePress} titleNumberOfLines={1}  title={!filter ?'Filter':filter}>
+                {filterData.map((e)=>
+                <List.Item key={e.id} title={e.name} onPress={()=>handleChildPress(e)}/>)}
+                {/* <List.Item title='Week'/>
+                <List.Item title='Month'/>
+                <List.Item title='Quarter'/>
+                <List.Item title='Bi-Annual'/>
+                <List.Item title='Annual'/> */}
+                </List.Accordion>
+            </View>
             <View style={tw`flex-row flex-wrap justify-between `}>
                 { data.map(e=>
                     <IconCard
@@ -219,22 +244,24 @@ const overdueCallback=(res)=>{
     // console.log(org)
   return (
     <View style={tw`h-full`}>
-        <ModalTemplate visible={addTask}  body={<AddTask setVisible={setAddTask}/>}/>
-        <ModalTemplate visible={uploadTask}   body={<UploadTask setVisible={setUploadTask}/>}/>
-        <ModalTemplate visible={viewTask}   body={<ViewTask setVisible={setViewTask} details={details} />}/>
-        <ModalTemplate visible={submitTask}   body={<UploadTask setVisible={setSubmitTask} id={selected}/>}/>
-        <ModalTemplate visible={reworkTask}   body={<Rework setVisible={setReworkTask} id={selected} />}/>
-        <ModalTemplate visible={rateTask}   body={<Rate setVisible={setRateTask}/>}/>
+        <ModalTemplate visible={addTask} body={<AddTask setVisible={setAddTask} setShowToast={setShowToast} setReload={setReload}/>}/>
+        <ModalTemplate visible={uploadTask} body={<UploadTask setVisible={setUploadTask} setShowToast={setShowToast} setReload={setReload}/>}/>
+        <ModalTemplate visible={viewTask}  body={<ViewTask setVisible={setViewTask} details={details}  setShowToast={setShowToast} setReload={setReload}/>}/>
+        <ModalTemplate visible={submitTask}   body={<UploadTask setShowToast={setShowToast} setReload={setReload} setVisible={setSubmitTask} id={selected}/>}/>
+        <ModalTemplate visible={reworkTask}   body={<Rework setVisible={setReworkTask} setShowToast={setShowToast} setReload={setReload} id={selected} />}/>
+        <ModalTemplate visible={rateTask}   body={<Rate setVisible={setRateTask}  setShowToast={setShowToast} setReload={setReload} />}/>
         {/* <View style={tw`mx-2`}>
             <HeadButtons/>
         </View> */}
         <FlatList
             // data={cardData.filter(e=>e.status=='Pending').map(e=>e)}
             data={taskInfo}
-            keyExtractor={(item)=>item.id}
+            keyExtractor={(item,i)=>i}
             ListHeaderComponent={<HeadComponent/>}
-            style={tw`p-5 bg-gray-100`}
-            ListFooterComponent={<View style={tw`h-10`}/>}
+            onRefresh={onRefresh}
+            refreshing={isFetching}
+            style={tw`p-5 bg-gray-100 `}
+            ListFooterComponent={<View style={tw`h-32`}/>}
             renderItem={
                 ({item})=>
                 <View style={tw`justify-around w-full `}>
@@ -250,6 +277,8 @@ const overdueCallback=(res)=>{
                     navigation={navigation}
                     setRework ={setReworkTask} 
                     setRate ={setRateTask} 
+                    setRefresh={setRefresh}
+                    refresh={refresh}
                     details = {item}
                     isMe={true}
                     button1={

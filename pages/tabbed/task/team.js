@@ -50,6 +50,7 @@ export default function Individual() {
     const [selectedVal, setSelectedVal] = useState('pending')
     const [item, setItem] = useState(null)
     const [reload, setReload] = useState(false)
+    const [isFetching, setIsFetching] = useState(false)
 
     const handleChildPress = (income) => {
         setExpanded(!expanded)
@@ -150,6 +151,15 @@ export default function Individual() {
         setSelectedVal(info.value)
     }
 
+    const onRefresh = async () => {
+        MemberTasks(dashboardCallback)
+        if(memberEmail){
+            startDate ?
+            MemberTasksByEmail(memberEmail,callback,startDate)
+            :
+            MemberTasksByEmail(memberEmail,callback)
+        }
+      };
     const HeadButtons =()=>{
         return(
             <View style={tw`flex-row justify-end`}>
@@ -197,12 +207,12 @@ export default function Individual() {
     
   return (
     <View>
-        <ModalTemplate visible={addTask}  body={<AddTask setVisible={setAddTask}/>}/>
-        <ModalTemplate visible={uploadTask}   body={<UploadTask setVisible={setUploadTask}/>}/>
-        <ModalTemplate visible={viewTask}   body={<ViewTask setVisible={setViewTask}/>}/>
-        <ModalTemplate visible={submitTask}   body={<Submit setVisible={setSubmitTask}/>}/>
-        <ModalTemplate visible={reworkTask}   body={<Rework setVisible={setReworkTask} id={selected} />}/>
-        <ModalTemplate visible={rateTask}   body={<Rate setVisible={setRateTask} setShowToast={setShowToast} setReload={setReload} details={item} id={selected}/>}/>
+        <ModalTemplate visible={addTask}  body={<AddTask setShowToast={setShowToast} setReload={setReload} setVisible={setAddTask}/>}/>
+        <ModalTemplate visible={uploadTask}   body={<UploadTask setShowToast={setShowToast} setReload={setReload} setVisible={setUploadTask}/>}/>
+        <ModalTemplate visible={viewTask}   body={<ViewTask setShowToast={setShowToast} setReload={setReload} setVisible={setViewTask}/>}/>
+        <ModalTemplate visible={submitTask}   body={<Submit setShowToast={setShowToast} setReload={setReload} setVisible={setSubmitTask}/>}/>
+        <ModalTemplate visible={reworkTask}   body={<Rework setShowToast={setShowToast} setReload={setReload} setVisible={setReworkTask} id={selected} />}/>
+        <ModalTemplate visible={rateTask}   body={<Rate setVisible={setRateTask} setShowToast={setShowToast} setReload={setReload} reload={reload} details={item} id={selected}/>}/>
         {/* <View style={tw`mx-2`}> */}
         <View style={tw`w-11/12 mb-1 mx-3 flex-row justify-between`}>
            
@@ -238,7 +248,9 @@ export default function Individual() {
             keyExtractor={(item)=>item.id}
             ListHeaderComponent={filterMember?<HeadComponent/>:<></>}
             style={tw`p-5 bg-gray-100`}
-            ListFooterComponent={<View style={tw`h-10`}/>}
+            onRefresh={onRefresh}
+            refreshing={isFetching}
+            ListFooterComponent={<View style={tw`h-32`}/>}
             renderItem={
                 ({item})=>
                 <View style={tw`justify-around w-full `}>
@@ -255,6 +267,7 @@ export default function Individual() {
                     setRework ={setReworkTask} 
                     setRate ={setRateTask} 
                     item={item}
+                    details={item}
                     button1={
                             
                         <TouchableOpacity onPress={()=>handleSelection(item.task_id,item)} style={tw`px-2 rounded-lg w-5/6 border border-blue-900`}>

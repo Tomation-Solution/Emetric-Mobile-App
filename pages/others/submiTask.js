@@ -30,16 +30,7 @@ export default function SubmiTask({navigation, route}) {
     const [rateTask, setRateTask] = useState(false)
     const [selected,setSelected] =  useState(null)
     const [value,setValue] =  useState(null)
-    const cardData = [
-        {id:1, name:'Responsibilities For The Day To Day Relationship Managment of Chanel Patners Demo 1@gmail.com', time:'2022- 04-22 08:00:00', status:'Pending'},
-        {id:2, name:'Responsibilities For The Day To Day Relationship Managment of Chanel Patners Demo 1@gmail.com', time:'2022- 04-22 08:00:00', status:'Pending'},
-        {id:3, name:'Responsibilities For The Day To Day Relationship Managment of Chanel Patners Demo 1@gmail.com', time:'2022- 04-22 08:00:00', status:'Pending'},
-        {id:4, name:'Responsibilities For The Day To Day Relationship Managment of Chanel Patners Demo 1@gmail.com', time:'2022- 04-22 08:00:00', status:'Pending'},
-        {id:5, name:'Responsibilities For The Day To Day Relationship Managment of Chanel Patners Demo 1@gmail.com', time:'2022- 04-22 08:00:00', status:'Pending'},
-        {id:6, name:'Responsibilities For The Day To Day Relationship Managment of Chanel Patners Demo 1@gmail.com', time:'2022- 04-22 08:00:00', status:'Pending'},
-        {id:7, name:'Responsibilities For The Day To Day Relationship Managment of Chanel Patners Demo 1@gmail.com', time:'2022- 04-22 08:00:00', status:'Pending'},
-       
-    ]
+    const [refresh,setRefresh] =  useState(false)
 
     const handleSelection =(id)=>{
         if(id==selected){
@@ -48,16 +39,18 @@ export default function SubmiTask({navigation, route}) {
             setSelected(id)
         }
     }
-    console.log(route.params.task_id)
+    // console.log(r/zoute.params.task_id)
 
     useEffect(()=>{
         getTaskBid(route.params.task_id, callback)
-    },[])
+    },[refresh])
 
     const callback =(res)=>{
-        // console.log(res.data.data.map(e=>e))
+        // console.log(res.data.data)r
         setSubmittedData(res.data.data)
     }
+
+    // console.log(route.params)
 
     // const handleSubmit=()=>{
     //     const data ={'task[task_id]'}
@@ -75,16 +68,24 @@ export default function SubmiTask({navigation, route}) {
             task Submitted Successfully
         </Snackbar>
         
-        <ModalTemplate visible={viewTask}   body={<ViewSubmittedTask id={route.params.task_id} setVisible={setViewTask}/>}/>
-        <ModalTemplate visible={submitTask}   body={<Submit setValue={setValue} details={route.params.details} id={route.params.task_id} setVisible={setSubmitTask} setshowToast = {setshowToast}/>}/>
+        <ModalTemplate visible={viewTask}   body={<ViewSubmittedTask id={route.params.task_id} details={route.params.details} subDetails={submittedData} setVisible={setViewTask}/>}/>
+        <ModalTemplate visible={submitTask}  
+             body={<Submit setValue={setValue}
+             details={route.params.details} 
+             id={route.params.task_id} setVisible={setSubmitTask} 
+             setshowToast = {setshowToast}
+             setRefresh={setRefresh}
+             refresh = {refresh}
+        />}
+        />
         <ModalTemplate visible={reworkTask}   body={<Rework setVisible={setReworkTask}/>}/>
         <ModalTemplate visible={rateTask}   body={<Rate setVisible={setRateTask}/>}/>
 
         <TobBar
         body={
             <View style={tw`flex-row justify-between px-2 py-3 bg-gray-100`}>
-                <Ionicon name='arrow-back' onPress={()=>navigation.toggleDrawer()} size={23} />
-                <Text style={tw`font-bold`}>Debo's Submitted Tasks</Text>
+                <Ionicon name='arrow-back' onPress={()=>navigation.goBack()} size={23} />
+                <Text style={tw`font-bold`}>Submitted Tasks</Text>
                 <Ionicon name='md-notifications' size={20} />
 
             </View>
@@ -107,11 +108,12 @@ export default function SubmiTask({navigation, route}) {
                 <View style={tw`justify-around w-full `}>
                    
                   {   item ?
-                    <SubmitTaskCard name={item.name}
+                    <SubmitTaskCard name={route.params.details.name}
                     time={item.start_date + ' ' + item.start_time}
-                    status={item.task_status}
-                    id={item.task_id}
+                    status={route.params.details.task_status}
+                    id={route.params.details.task_id}
                     selected ={selected} 
+                    download={item.submission}
                     setSelected ={setSelected} 
                     setView ={setViewTask} 
                     navigation={navigation}
@@ -121,7 +123,7 @@ export default function SubmiTask({navigation, route}) {
                     details={item}
                     button1={
                             
-                        <TouchableOpacity onPress={()=>handleSelection(item.id)} style={tw`px-2 rounded-lg w-5/6 border mx-auto border-blue-900`}>
+                        <TouchableOpacity onPress={()=>handleSelection(route.params.details.task_id)} style={tw`px-2 rounded-lg w-5/6 border mx-auto border-blue-900`}>
                             <FeatherIcon size={20} style={tw`text-center`} name='more-horizontal'/>
                         </TouchableOpacity>
                     
