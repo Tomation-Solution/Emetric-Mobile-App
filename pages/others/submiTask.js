@@ -100,6 +100,7 @@ export default function SubmiTask({navigation, route}) {
       <FlatList
             data={submittedData}
             keyExtractor={(item)=>item.id}
+            horizontal={false}
             // ListHeaderComponent={<HeadComponent/>}
             style={tw`p-5 bg-gray-100`}
             // ListFooterComponent={<BottomComponents/>}

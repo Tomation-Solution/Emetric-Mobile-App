@@ -1,5 +1,5 @@
 import { ScrollView,View, FlatList, Picker, Text } from 'react-native'
-import {List, Portal} from 'react-native-paper'
+import {ActivityIndicator, List, Portal} from 'react-native-paper'
 import React, {useState, useEffect} from 'react'
 import tw from 'tailwind-react-native-classnames'
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons' 
@@ -260,13 +260,12 @@ const overdueCallback=(res)=>{
             ListHeaderComponent={<HeadComponent/>}
             onRefresh={onRefresh}
             refreshing={isFetching}
+            ListEmptyComponent={taskInfo && <Text style={tw`text-center h-20 my-auto`}>No Data</Text>}
             style={tw`p-5 bg-gray-100 `}
-            ListFooterComponent={<View style={tw`h-32`}/>}
+            ListFooterComponent={taskInfo?<View style={tw`h-32`}/>:<ActivityIndicator/>}
             renderItem={
-                ({item})=>
+                ({item})=> 
                 <View style={tw`justify-around w-full `}>
-                   
-
                     <TaskCard name={item.name}
                     time={item.start_date + ' ' + item.start_time}
                     status={item.task_status}
@@ -289,8 +288,9 @@ const overdueCallback=(res)=>{
                     
                     }
                 />
-                </View>
+                </View> 
             }
+            
         />
     </View>
   )

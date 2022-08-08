@@ -36,7 +36,7 @@ export const TaskCard =(props)=>{
                 </View>}
                 { props.details.task_status == 'pending' ? <></>:
                 <View style={tw`w-full`}>
-                    <SmallButton pressed={()=>props.navigation.navigate('submitTask', {task_id:props.selected, refresh:props.refresh, setRefresh:props.setRefresh,details:props.details})} text='List Submitted Tasks'/>
+                    <SmallButton pressed={()=>props.navigation.navigate('submitTask', {task_id:props.selected, refresh:props?.refresh, setRefresh:props?.setRefresh,details:props?.details})} text='List Submitted Tasks'/>
                 </View>}
                 { props.isMe ?<></>:
                 <View style={tw`w-full`}>
