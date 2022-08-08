@@ -167,7 +167,31 @@ export const CorporateDashboard = async(status,callback,startDate)=>{
 
 
 // /client/{{ORGANISATION_NAME}}/task/report/team-initiative/:team_id/
-export const getTeamInitiatives = async(callback,startDate)=>{
+export const getTeamInitiatives = async(callback,email)=>{
+    // console.log(localStorage.getItem('user_id'))
+    try {
+        const response = email ? await api.get(`client/${localStorage.getItem('org_name')}/initiative/?owner_email=${email}`)
+        : await api.get(`client/${localStorage.getItem('org_name')}/initiative/?owner_email=${localStorage.getItem('email')}`);
+    //    
+        if (response.status==200) {
+            // console.log(response.data.data[0])
+            callback(response.data.data);
+            
+        } else {
+          console.log(response.data.status)
+          callback(response.data)
+        // setLoading(false)
+        }
+    } catch (error) {
+        console.error(error)
+        callback(error)
+        // setLoading(false)
+
+    }
+}
+
+// /client/{{ORGANISATION_NAME}}/task/report/team-initiative/:team_id/
+export const getInitiativesByEmail = async(callback,startDate)=>{
     // console.log(localStorage.getItem('user_id'))
     try {
         const response = startDate ? await api.get(`client/${localStorage.getItem('org_name')}/objective/?objective_status=pending&start_date_after=2022-01-06&dashboard_report=True/`)
@@ -228,14 +252,15 @@ export const UploadBulkTask = async(callback,formdata, setLoading)=>{
             
         } else {
           console.log(response.data.status)
-          setLoading(false)
+          
           callback(response.data)
+          setLoading(false)
         // setLoading(false)
         }
     } catch (error) {
-        setLoading(false)
+        
         console.error(error.response.data.errors[0].message.map(e=>e.message))
         alert(error.response.data.errors[0].message.map(e=>'Line ' +e.line+' '+e.message))
-
+        setLoading(false)
     }
 }

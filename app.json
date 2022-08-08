@@ -1,14 +1,22 @@
 {
+  "name": "emetricsuite",
+  "displayName": "E-metric Suite",
   "expo": {
-    "name": "emetric-suite",
+    "name": "Emetric Suite",
     "slug": "emetric-suite",
+    "icon": "./images/Logo/emetricIcon.png",
     "version": "1.0.0",
     "assetBundlePatterns": [
       "**/*"
     ],
     "description": "",
     "ios": {
-      "bundleIdentifier": "org.name.emetricsuite"
+      "bundleIdentifier": "org.name.emetricsuite",
+      "buildNumber": "1.0.0"
+    },
+    "android": {
+      "package": "com.name.emetricsuite",
+      "versionCode": 1
     }
   }
 }

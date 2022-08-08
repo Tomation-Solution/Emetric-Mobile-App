@@ -105,9 +105,9 @@ return (
         ({item})=>
         <View style={tw`justify-around w-1/2`}>
             <IconCard
-                amount={item.value}
+                amount={item.amount ? item.value:0}
                 description={item.name}
-                percent={item.percent}
+                percent={item.percent ? item.percent : 0}
                 bg='bg-blue-100'
             />
         </View>

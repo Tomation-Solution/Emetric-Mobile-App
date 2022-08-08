@@ -13,6 +13,7 @@ import Input from '../../helpers/Input';
 import { Checkbox, List, TextInput } from 'react-native-paper';
 import CustomPicker from '../../helpers/Picker';
 import { ReworkTask } from '../../../actions/actions';
+import Toast from '../../helpers/Toast';
 
 
 export default function Rework(props) {
@@ -30,6 +31,10 @@ const [show, setShow] = useState(false);
 const [expandedMember, setExpandedMember] = React.useState(false);
 const [filterMember, setFilterMember] = useState(null)
 const [remark, setRemark] = useState(null);
+const [showToast, setShowToast] = useState(false)
+const [message, setMessage] = useState(null)
+const [success, setSuccess] = useState(false)
+
 const handleChildPressMember = (member) => {
     setExpandedMember(!expandedMember);
   setFilterMember(member)}
@@ -94,11 +99,21 @@ const handleRework=()=>{
 
 const callback =(res)=>{
     console.log(res)
+    setShowToast(true)
+    // setMessage()
+    // if(res.status==200){
+        setMessage('Rework has been set')
+        setSuccess(true)
+        props.setVisible(false)
+        props.setReload(true)
+    // }
 
 }
 
   return (
-            <View style={tw`m-auto bg-white rounded-xl w-10/12 px-4`}>
+          <View style={tw`m-auto bg-white rounded-xl w-10/12 px-4`}>
+              <Toast showToast={showToast} setShowToast={setShowToast} message={message} success={success} />
+            
             <View style={tw`border-b border-green-300 my-3 mx-5`}>
                 <Text style={tw`font-bold text-base text-center py-3 text-blue-800`}>Rate Task</Text>
             </View>
@@ -160,7 +175,7 @@ const callback =(res)=>{
                 </Pressable>
                 <View style={tw`w-5/12`}>
                 { loading ? 
-                <View style={tw`w-6/12 mx-auto`}>
+                <View style={tw`w-full mx-auto`}>
                     <Text style={tw`text-center bg-gray-200 py-3 rounded-lg`}>Upload</Text>
                 </View>:
                     <RoundedButton text='Submit' pressed={handleRework}/>

@@ -4,6 +4,7 @@ import localStorage from 'react-native-sync-localstorage'
 // imoprt {useNavigation}
 
 const URL = 'http://emetric-suite-backend.herokuapp.com/'
+// const URL = 'https://emetric-suite-revamp.herokuapp.com/'
 // const navigation = useNavigation()
 
 const instance = axios.create({
@@ -22,17 +23,17 @@ instance.interceptors.request.use((config) => {
   return config;
 });
 
-instance.interceptors.response.use(response => {
-  return response;
-}, error => {
- if (error.response.status === 401) {
-  //place your reentry code
-  NavigationAction.navigate('login')
-  alert('Session Expired')
- }else{
-  error.message
+// instance.interceptors.response.use(response => {
+//   return response;
+// }, error => {
+//  if (error.response.status === 401) {
+//   //place your reentry code
+//   NavigationAction.navigate('login')
+//   alert('Session Expired')
+//  }else{
+//   error.message
 
- }
- return error;
-});
+//  }
+//  return error;
+// });
 export default instance;

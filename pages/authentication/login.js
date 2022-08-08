@@ -30,6 +30,7 @@ export default function Login ({navigation}) {
   const callback=(response)=>{
       if(response.status==200){
         setLoading(false)
+        console.log(response)
         navigation.navigate('dashboard')
       }else{
         setMessage(response.message)
@@ -47,7 +48,7 @@ export default function Login ({navigation}) {
       {/* <Text>{localStorage.getItem('tokens').access}</Text> */}
       <View style={tw`mx-10`}>
          <Text style={tw`text-base text-blue-900 font-bold pb-3`}>Login to Your Organization</Text>
-          <Text>Input details to get started as admin</Text>
+          <Text>Input details to get started as user</Text>
       </View>
        
         <View style={tw`mt-3 mx-5 py-6 bg-white  shadow-sm rounded-3xl px-5`}>

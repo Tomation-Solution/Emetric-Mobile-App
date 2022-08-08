@@ -40,7 +40,7 @@ export default function PickDate(props) {
       )}
                 {Platform.OS=='android' && (
                 <Pressable onPress={showDatepicker} style={tw`py-3 bg-gray-100 rounded-lg px-2`}>
-                    <Text>{moment(props.date).format('YYYY-MM-DD')}</Text>
+                    <Text>{ props.mode=='date' ? moment(props.date).format('YYYY-MM-DD') : moment(props.date).format('LT')}</Text>
                 </Pressable>)}
                 
                 <View style={tw`w-full justify-between`}>
